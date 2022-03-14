@@ -1,0 +1,16 @@
+{
+	"name": "laserfence",
+	"version": "1.0.0",
+	"title": "Laser Fence",
+	"author": "randomflyingtaco and Sacredanarchy",
+	"contact": "",
+	"homepage": "https://discord.gg/freXKz5",
+	"factorio_version": "1.1",
+	"dependencies": [
+		"base >= 1.1",
+		"? Factorio-Tiberium",
+		"? TeslaTank",
+		"? Soviet-Tesla_Coils"
+	],
+	"description": "Use Laser Fence technology developed during the Tiberium Wars to fend off biters."
+}
