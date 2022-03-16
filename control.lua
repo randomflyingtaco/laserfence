@@ -1,5 +1,6 @@
 require("util")
 require("scripts/CnC_Walls") --Note, to make SonicWalls work / be passable
+local migration = require("scripts/migration")
 
 local debugText = settings.startup["laserfence-debug-text"].value
 
@@ -12,6 +13,23 @@ script.on_init(function()
 		global.laserfenceDamageMulti[name] = multi
 	end
 	CnC_SonicWall_OnInit()
+end)
+
+script.on_configuration_changed(function(event)
+	if migration.upgradingToVersion(event, "1.1.1") then
+		game.print("Ran conversion for Laser Fence version 1.1.1")
+		global.SRF_nodes = {}
+		global.SRF_node_ticklist = {}
+		global.SRF_low_power_ticklist = {}
+
+		for _, surface in pairs(game.surfaces) do
+			-- Reposition emitters
+			for _, post in pairs(surface.find_entities_filtered{name = "laserfence-post"}) do
+				post.teleport({post.position.x, math.floor(post.position.y) + 0.5625})
+				CnC_SonicWall_AddNode(post, game.tick)
+			end
+		end
+	end
 end)
 
 commands.add_command("laserfenceRebuild",
@@ -66,7 +84,7 @@ function registerEntity(entity)  -- Cache relevant information to global and reg
 end
 
 function registerObstruction(entity, node1, node2)  -- Cache relevant information to global and register
-	local entityInfo = {}
+	local entityInfo = {}  -- TODO restructure so multilple walls can be registered to the same obstruction, also do the conversion
 	entityInfo["node1"] = node1
 	entityInfo["node2"] = node2
 	for _, property in pairs({"name", "type", "position", "surface", "force"}) do
@@ -84,7 +102,7 @@ function on_new_entity(event)
 	if (new_entity.name == "laserfence-connector") then
 		local emitter = surface.create_entity{
 			name = "laserfence-post",
-			position = {position.x, position.y + 0.01},
+			position = {position.x, position.y + 0.0625},
 			force = force,
 			raise_built = true
 		}
@@ -106,7 +124,7 @@ function on_remove_entity(event)
 		local force = entity.force
 		if (entity.name == "laserfence-post") then
 			if surface and surface.valid then
-				for _, connector in pairs(surface.find_entities_filtered{name = "laserfence-connector", position = {position.x, position.y - 0.01}}) do
+				for _, connector in pairs(surface.find_entities_filtered{name = "laserfence-connector", position = {position.x, position.y - 0.0625}}) do
 					connector.destroy()
 				end
 			end
@@ -114,7 +132,7 @@ function on_remove_entity(event)
 		end
 		global.laserfenceOnEntityDestroyed[event.registration_number] = nil  -- Avoid this global growing forever
 	else
-		local entity = global.laserfenceObstruction[event.registration_number]
+		local entity = global.laserfenceObstruction[event.registration_number] --TODO crash?
 		if entity then
 			local node1 = entity.node1
 			local node2 = entity.node2

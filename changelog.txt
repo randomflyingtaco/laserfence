@@ -1,4 +1,8 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.1
+  Bugfixes:
+    - Fixed fences occasionally stopping one tile short of connecting to the next emitter
+---------------------------------------------------------------------------------------------------
 Version: 1.0.0
   Changes:
     - None, initial release.

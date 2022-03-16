@@ -150,7 +150,7 @@ function CnC_SonicWall_DestroyedWall(entity)
 				ty = ty + dir_mod.y
 			end
 			-- find srf, set power to 5%, add ticklist
-			local post = surf.find_entity("laserfence-post", {tx + 0.5, ty + 0.51})
+			local post = surf.find_entity("laserfence-post", {tx + 0.5, ty + 0.5625})
 			post.energy = 0.2 * post.electric_buffer_size
 			table.insert(global.SRF_node_ticklist, {emitter = post, position = post.position, tick = game.tick + ceil(post.electric_buffer_size / post.electric_input_flow_limit)})
 		end

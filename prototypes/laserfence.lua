@@ -81,7 +81,7 @@ data:extend{
 					width = 128,
 					height = 256,
 					scale = 0.3,
-					shift = {0, -0.71}
+					shift = {0, -0.7625}
 				}
 			}
 		},
