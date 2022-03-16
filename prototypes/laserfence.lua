@@ -285,6 +285,13 @@ data:extend{
 			left  = post_sprite,
 			right = post_sprite,
 		},
+	},
+	{
+		type = "flying-text",
+		name = "laserfence-obstruction-text",
+		flags = {"not-on-map", "placeable-off-grid"},
+		time_to_live = 180,
+		speed = 1 / 60,
 	}
 }
 

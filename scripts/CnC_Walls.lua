@@ -172,6 +172,12 @@ function CnC_SonicWall_TestWall(surf, pos, dir, node1, node2)
 	for _, entity in pairs(obstructions) do
 		if debugText then game.print("Blocked by "..entity.name) end
 		registerObstruction(entity, node1, node2)
+		surf.create_entity{
+				name = "laserfence-obstruction-text",
+				position = {x = x - 1.5, y = y - 1},
+				text = {"entity-description.laserfence-obstruction-text", {"entity-name."..entity.name}},
+				color = {r = 255, g = 255, b = 255},
+		}
 	end
 	return #obstructions == 0
 end
