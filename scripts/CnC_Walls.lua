@@ -168,18 +168,19 @@ function CnC_SonicWall_TestWall(surf, pos, dir, node1, node2)
 	if wall then
 		return wall[1] == horz_wall + vert_wall - dir --There is already a wall in the direction we want
 	end
-	local obstructions = surf.find_entities_filtered{area = {{x, y}, {x + 0.9, y + 0.9}}, collision_mask = "object-layer"}
-	for _, entity in pairs(obstructions) do
-		if debugText then game.print("Blocked by "..entity.name) end
-		registerObstruction(entity, node1, node2)
+	local obstruction = surf.find_entities_filtered{area = {{x, y}, {x + 0.9, y + 0.9}}, collision_mask = "object-layer"}[1]
+	if obstruction then
+		if debugText then game.print("Blocked by "..obstruction.name) end
+		registerObstruction(obstruction, node1, node2)
 		surf.create_entity{
 				name = "laserfence-obstruction-text",
-				position = {x = x - 1.5, y = y - 1},
-				text = {"entity-description.laserfence-obstruction-text", {"entity-name."..entity.name}},
+				position = {x = x - 1.5, y = y},
+				text = {"entity-description.laserfence-obstruction-text", {"entity-name."..obstruction.name}},
 				color = {r = 255, g = 255, b = 255},
 		}
+		return false
 	end
-	return #obstructions == 0
+	return true
 end
 
 --Makes a wall of a given orientation can be placed at a given position
@@ -218,7 +219,10 @@ function tryCnC_SonicWall_MakeWall(node1, node2)
 			sy = min(node1.position.y, that_pos.y) + 1
 			ty = max(node1.position.y, that_pos.y) - 1
 			for y = sy, ty do
-				if not CnC_SonicWall_TestWall(node1.surface, {node1.position.x, y}, vert_wall, node1, node2) then return end
+				if not CnC_SonicWall_TestWall(node1.surface, {node1.position.x, y}, vert_wall, node1, node2) then
+					game.print("Failed at x: "..that_pos.x.." y: "..y)
+					return
+				end
 			end
 			for y = sy, ty do
 				CnC_SonicWall_MakeWall(node1.surface, {node1.position.x, y}, vert_wall, node1)
@@ -231,7 +235,10 @@ function tryCnC_SonicWall_MakeWall(node1, node2)
 			sx = min(node1.position.x, that_pos.x) + 1
 			tx = max(node1.position.x, that_pos.x) - 1
 			for x = sx, tx do
-				if not CnC_SonicWall_TestWall(node1.surface, {x, node1.position.y}, horz_wall, node1, node2) then return end
+				if not CnC_SonicWall_TestWall(node1.surface, {x, node1.position.y}, horz_wall, node1, node2) then
+					game.print("Failed at x: "..x.." y: "..that_pos.y)
+					return
+				end
 			end
 			for x = sx, tx do
 				CnC_SonicWall_MakeWall(node1.surface, {x, node1.position.y}, horz_wall, node1)

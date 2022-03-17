@@ -4,6 +4,7 @@ Version: 1.1.1
     - Added floating text to notify when something is blocking a fence from connecting
   Bugfixes:
     - Fixed fences occasionally stopping one tile short of connecting to the next emitter
+    - Fixed large obstructions not allowing fences to form after they have been removed
 ---------------------------------------------------------------------------------------------------
 Version: 1.0.0
   Changes:

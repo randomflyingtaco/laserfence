@@ -29,6 +29,10 @@ script.on_configuration_changed(function(event)
 				CnC_SonicWall_AddNode(post, game.tick)
 			end
 		end
+		-- Update global for new shared-obstruction registration
+		for registration_number, entityInfo in pairs(global.laserfenceObstruction) do
+			global.laserfenceObstruction[registration_number] = {entityInfo}
+		end
 	end
 end)
 
@@ -91,7 +95,11 @@ function registerObstruction(entity, node1, node2)  -- Cache relevant informatio
 		entityInfo[property] = entity[property]
 	end
 	local registration_number = script.register_on_entity_destroyed(entity)
-	global.laserfenceObstruction[registration_number] = entityInfo
+	if global.laserfenceObstruction[registration_number] then
+		table.insert(global.laserfenceObstruction[registration_number], entityInfo)
+	else
+		global.laserfenceObstruction[registration_number] = {entityInfo}
+	end
 end
 
 function on_new_entity(event)
@@ -131,16 +139,17 @@ function on_remove_entity(event)
 			CnC_SonicWall_DeleteNode(entity, event.tick)
 		end
 		global.laserfenceOnEntityDestroyed[event.registration_number] = nil  -- Avoid this global growing forever
-	else
-		local entity = global.laserfenceObstruction[event.registration_number] --TODO crash?
-		if entity then
-			local node1 = entity.node1
-			local node2 = entity.node2
-			if node1.valid and node2.valid then
-				tryCnC_SonicWall_MakeWall(node1, node2)
+	elseif global.laserfenceObstruction[event.registration_number] then
+		for _, entityInfo in pairs(global.laserfenceObstruction[event.registration_number]) do --TODO crash?
+			if entityInfo then
+				local node1 = entityInfo.node1
+				local node2 = entityInfo.node2
+				if node1.valid and node2.valid then
+					tryCnC_SonicWall_MakeWall(node1, node2)
+				end
 			end
-			global.laserfenceObstruction[event.registration_number] = nil  -- Avoid this global growing forever
 		end
+		global.laserfenceObstruction[event.registration_number] = nil  -- Avoid this global growing forever
 	end
 end
 

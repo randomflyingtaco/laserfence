@@ -1,3 +1,5 @@
+local offset = 0.0625
+
 local post_sprite = {
 	layers = {
 		{
@@ -9,7 +11,7 @@ local post_sprite = {
 			width = 128,
 			height = 256,
 			scale = 0.3,
-			shift = {0, -0.7}
+			shift = {0, -0.7 + offset}
 		},
 		{
 			filename = modName.."/graphics/post-shadow.png",
@@ -21,7 +23,7 @@ local post_sprite = {
 			height = 128,
 			scale = 0.3,
 			draw_as_shadow = true,
-			shift = {0.5, 0}
+			shift = {0.5, 0 + offset}
 		}
 	}
 }
@@ -81,7 +83,7 @@ data:extend{
 					width = 128,
 					height = 256,
 					scale = 0.3,
-					shift = {0, -0.7625}
+					shift = {0, -0.7}
 				}
 			}
 		},
@@ -159,7 +161,7 @@ data:extend{
 				width = 128,
 				height = 256,
 				scale = 0.3,
-				shift = {0, -0.7},
+				shift = {0, -0.7 + offset},
 				draw_as_glow = true
 			},
 			{
@@ -172,7 +174,7 @@ data:extend{
 				width = 128,
 				height = 256,
 				scale = 0.3,
-				shift = {0, -1.025},
+				shift = {0, -1.025 + offset},
 				draw_as_glow = true
 			},
 			{
@@ -185,7 +187,7 @@ data:extend{
 				width = 128,
 				height = 256,
 				scale = 0.3,
-				shift = {0, -0.7},
+				shift = {0, -0.7 + offset},
 				draw_as_glow = true
 			}
 		},
