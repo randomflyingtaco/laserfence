@@ -35,8 +35,8 @@ data:extend{
 		icon = modName.."/graphics/post-icon.png",
 		icon_size = 64,
 		flags = {"placeable-neutral", "placeable-off-grid", "player-creation", "not-blueprintable"},
-		collision_box = {{-0.3, -0.3}, {0.3, 0.3}},
-		selection_box = {{-0.5, -0.5}, {0.5, 0.5}},
+		collision_box = {{-0.49, -0.49 - offset}, {0.49, 0.49 - offset}},
+		selection_box = {{-0.5, -0.5 - offset}, {0.5, 0.5 - offset}},
 		minable = {mining_time = 0.5, result = "laserfence-post"},
 		placeable_by = {item = "laserfence-post", count = 1},
 		max_health = 200,
@@ -126,7 +126,7 @@ data:extend{
 		order = "a[remnants]",
 		selection_box = {{-0.5, -0.5}, {0.5, 0.5}},
 		selection_priority = 1,
-		collision_box = {{-0.4, -0.4}, {0.4, 0.4}},
+		collision_box = {{-0.49, -0.49}, {0.49, 0.49}},
 		created_effect = {
 			type = "direct",
 			action_delivery = {
@@ -258,7 +258,7 @@ data:extend{
 		icon = modName.."/graphics/post-icon.png",
 		icon_size = 64,
 		flags = {"placeable-neutral", "player-creation"},
-		collision_box = {{-0.3, -0.3}, {0.3, 0.3}},
+		collision_box = {{-0.49, -0.49}, {0.49, 0.49}},
 		collision_mask = {"item-layer", "object-layer", "water-tile"}, -- disable collision
 		fluid_box = {
 			filter = "fluid-unknown",

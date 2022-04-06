@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.2
+  Bugfixes:
+    - Fixed crash that occurred when a fence and a post died on the same tick
+    - Fixed small enemies being able to walk through laser fences
+    - Fixed laser fence selection box not being aligned with the grid
+---------------------------------------------------------------------------------------------------
 Version: 1.1.1
   Features:
     - Added floating text to notify when something is blocking a fence from connecting
