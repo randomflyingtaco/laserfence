@@ -25,7 +25,7 @@ data:extend{
 	},
 	{
 		type = "technology",
-		name = "laserfence-range",
+		name = "laserfence-range-1",
 		icons = util.technology_icon_constant_range(modName.."/graphics/256icon.png"),
 		order = "a-h-d",
 		effects = {
@@ -34,9 +34,33 @@ data:extend{
 				effect_description = {"technology-description.laserfence-range-effect", settings.startup["laserfence-added-range"].value}
 			}
 		},
-		prerequisites = {"laserfence", "utility-science-pack"},
+		prerequisites = {"laserfence"},
 		unit = {
-			count_formula = "200*L",
+			count = "100",
+			ingredients = {
+				{"automation-science-pack", 1},
+				{"logistic-science-pack", 1},
+				{"military-science-pack", 1},
+				{"chemical-science-pack", 1},
+			},
+			time = 30
+		},
+		upgrade = true,
+	},
+	{
+		type = "technology",
+		name = "laserfence-range-2",
+		icons = util.technology_icon_constant_range(modName.."/graphics/256icon.png"),
+		order = "a-h-d",
+		effects = {
+			{
+				type = "nothing",
+				effect_description = {"technology-description.laserfence-range-effect", settings.startup["laserfence-added-range"].value}
+			}
+		},
+		prerequisites = {"laserfence-range-1", "utility-science-pack"},
+		unit = {
+			count = "200",
 			ingredients = {
 				{"automation-science-pack", 1},
 				{"logistic-science-pack", 1},
@@ -46,7 +70,32 @@ data:extend{
 			},
 			time = 30
 		},
-		max_level = 3,
 		upgrade = true,
-	}
+	},
+	{
+		type = "technology",
+		name = "laserfence-range-3",
+		icons = util.technology_icon_constant_range(modName.."/graphics/256icon.png"),
+		order = "a-h-d",
+		effects = {
+			{
+				type = "nothing",
+				effect_description = {"technology-description.laserfence-range-effect", settings.startup["laserfence-added-range"].value}
+			}
+		},
+		prerequisites = {"laserfence-range-2", "space-science-pack"},
+		unit = {
+			count = "1000",
+			ingredients = {
+				{"automation-science-pack", 1},
+				{"logistic-science-pack", 1},
+				{"military-science-pack", 1},
+				{"chemical-science-pack", 1},
+				{"utility-science-pack", 1},
+				{"space-science-pack", 1},
+			},
+			time = 30
+		},
+		upgrade = true,
+	},
 }

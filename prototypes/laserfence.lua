@@ -299,10 +299,10 @@ if not settings.startup["laserfence-solid-walls"].value then
 	data.raw["simple-entity"]["laserfence-beam"].collision_mask = {"item-layer", "object-layer", "water-tile"}
 end
 
-for i = 1,4 do
+for i = 0,3 do
 	local name = "laserfence-connector-"..tostring(i)
 	local prototype = table.deepcopy(data.raw["pipe-to-ground"]["laserfence-connector"])
 	prototype.name = name
-	prototype.fluid_box.pipe_connections = all4pipes(baseRange + 1 + (i - 1) * addedRange)
+	prototype.fluid_box.pipe_connections = all4pipes(baseRange + 1 + i * addedRange)
 	data:extend{prototype}
 end
