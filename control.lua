@@ -3,14 +3,17 @@ require("scripts/CnC_Walls") --Note, to make SonicWalls work / be passable
 local migration = require("scripts/migration")
 
 local debugText = settings.startup["laserfence-debug-text"].value
+local connectorNames = {"laserfence-connector-1", "laserfence-connector-2", "laserfence-connector-3", "laserfence-connector-4"}
 
 script.on_init(function()
 	global.laserfenceOnEntityDestroyed = {}
 	global.laserfenceObstruction = {}
 	global.laserfenceDamageMulti = {}
+	global.laserfenceRangeUpgradeLevel = {}
 	for name, force in pairs(game.forces) do
 		local multi = force.get_ammo_damage_modifier("laser") or 0
 		global.laserfenceDamageMulti[name] = multi
+		global.laserfenceRangeUpgradeLevel[name] = 1
 	end
 	CnC_SonicWall_OnInit()
 end)
@@ -32,6 +35,28 @@ script.on_configuration_changed(function(event)
 		-- Update global for new shared-obstruction registration
 		for registration_number, entityInfo in pairs(global.laserfenceObstruction) do
 			global.laserfenceObstruction[registration_number] = {entityInfo}
+		end
+	end
+	if migration.upgradingToVersion(event, "1.1.2") then
+		game.print("Ran conversion for Laser Fence version 1.1.2")
+		global.laserfenceRangeUpgradeLevel = {}
+		for name, force in pairs(game.forces) do
+			global.laserfenceRangeUpgradeLevel[name] = 1
+			if force.technologies["laserfence"].researched then
+				global.laserfenceRangeUpgradeLevel[name] = 2
+				force.technologies["laserfence-range"].level = 2  -- Grant them the extra range to get back to 15 if they converted
+			end
+		end
+		for _, surface in pairs(game.surfaces) do
+			for _, connector in pairs(surface.find_entities_filtered{name = "laserfence-connector"}) do
+				surface.create_entity{
+					name = "laserfence-connector-"..tostring(global.laserfenceRangeUpgradeLevel[connector.force.name]),
+					force = connector.force,
+					position = connector.position,
+					create_build_effect_smoke = false
+				}
+				connector.destroy()
+			end
 		end
 	end
 end)
@@ -58,8 +83,7 @@ end
 script.on_event(defines.events.on_script_trigger_effect, function(event)
 	--Liquid Seed trigger
 	if event.effect_id == "laserfence-reflect-damage" then
-		local force = event.source_entity.force.name
-		local multi = global.laserfenceDamageMulti[force]
+		local multi = global.laserfenceDamageMulti[event.source_entity.force.name]
 		if debugText and event.target_entity then game.print("Dealing "..(10 * (1 + multi)).." reflect damage to "..event.target_entity.name) end
 		safeDamage(event.target_entity, 10 * (1 + multi))
 	end
@@ -108,6 +132,15 @@ function on_new_entity(event)
 	local position = new_entity.position
 	local force = new_entity.force
 	if (new_entity.name == "laserfence-connector") then
+		-- Swap the generic pipe-to-ground to the correct length version
+		new_entity.destroy()
+		surface.create_entity{
+			name = "laserfence-connector-"..tostring(global.laserfenceRangeUpgradeLevel[force.name]),
+			force = force,
+			position = position,
+			create_build_effect_smoke = false
+		}
+		-- Create actual emitter
 		local emitter = surface.create_entity{
 			name = "laserfence-post",
 			position = {position.x, position.y + 0.0625},
@@ -132,7 +165,7 @@ function on_remove_entity(event)
 		local force = entity.force
 		if (entity.name == "laserfence-post") then
 			if surface and surface.valid then
-				for _, connector in pairs(surface.find_entities_filtered{name = "laserfence-connector", position = {position.x, position.y - 0.0625}}) do
+				for _, connector in pairs(surface.find_entities_filtered{name = connectorNames, position = {position.x, position.y - 0.0625}, force = force}) do
 					connector.destroy()
 				end
 			end
@@ -166,5 +199,29 @@ script.on_event({defines.events.on_research_finished, defines.events.on_research
 	local force = event.research.force
 	local multi = force.get_ammo_damage_modifier("laser") or 0
 	global.laserfenceDamageMulti[force.name] = multi
+	if (event.research.name == "laserfence-range") then
+		local level = 4
+		if not event.research.researched then
+			level = event.research.level
+		end
+		global.laserfenceRangeUpgradeLevel[force.name] = level
+		for _, surface in pairs(game.surfaces) do
+			-- Swap pipe-to-ground to update range
+			for _, connector in pairs(surface.find_entities_filtered{name = connectorNames, force = force}) do
+				connector.destroy()
+			end
+			-- Reconnect emitters
+			for _, post in pairs(surface.find_entities_filtered{name = "laserfence-post"}) do
+				CnC_SonicWall_AddNode(post, game.tick)
+			end
+		end
+	end
+end
+)
+
+script.on_event({defines.events.on_force_created, defines.events.on_force_reset}, function(event)
+	local multi = event.force.get_ammo_damage_modifier("laser") or 0
+	global.laserfenceDamageMulti[event.force.name] = multi
+	global.laserfenceRangeUpgradeLevel[event.force.name] = 1
 end
 )

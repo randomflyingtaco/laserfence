@@ -9,7 +9,8 @@ local dir_mods = {
 	{x = 0, y = -1, variation = vert_wall}
 }
 
-local node_range = 16
+local baseRange = settings.startup["laserfence-base-range"].value
+local addedRange = settings.startup["laserfence-added-range"].value
 
 local abs   = math.abs
 local floor = math.floor
@@ -21,6 +22,7 @@ local min   = math.min
 --Returns array containing up to 4 entities that could connect to an SRF emitter at the given position
 --Assumes node_range, horz_wall, vert_wall, global.SRF_nodes
 function CnC_SonicWall_FindNodes(surf, pos, force, dir)
+	local node_range = baseRange + 1 + addedRange * (global.laserfenceRangeUpgradeLevel[force.name] - 1)
 	local near_nodes = {nil, nil, nil, nil}
 	local near_dists = {node_range, node_range * -1, node_range, node_range * -1}
 	for _, entry in pairs(global.SRF_nodes) do
@@ -210,13 +212,13 @@ function CnC_SonicWall_MakeWall(surf, pos, dir, node)
 end
 
 --Makes a wall connecting two given emitters if an uninterupted wall is possible
---Assumes node_range, horz_wall, vert_wall
+--Assumes horz_wall, vert_wall
 --Modifies global.SRF_segments
 function tryCnC_SonicWall_MakeWall(node1, node2)
 	local that_pos = node2.position
 	if node1.position.x == that_pos.x and node1.position.y ~= that_pos.y then
-		local diff = abs(that_pos.y - node1.position.y)
-		if diff <= node_range and diff > 1 then
+		-- Safe to assume these are withing valid range because it only runs on node pairs from FindNodes
+		if abs(that_pos.y - node1.position.y) > 1 then
 			local sy, ty
 			sy = min(node1.position.y, that_pos.y) + 1
 			ty = max(node1.position.y, that_pos.y) - 1
@@ -231,8 +233,7 @@ function tryCnC_SonicWall_MakeWall(node1, node2)
 			end
 		end
 	elseif node1.position.x ~= that_pos.x and node1.position.y == that_pos.y then
-		local diff = abs(that_pos.x - node1.position.x)
-		if diff <= node_range and diff > 1 then
+		if abs(that_pos.x - node1.position.x) > 1 then
 			local sx, tx
 			sx = min(node1.position.x, that_pos.x) + 1
 			tx = max(node1.position.x, that_pos.x) - 1

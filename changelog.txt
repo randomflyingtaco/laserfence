@@ -1,5 +1,7 @@
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.2
+  Features:
+    - Added new upgrade for increasing the maximum Laser Fence length
   Bugfixes:
     - Fixed crash that occurred when a fence and a post died on the same tick
     - Fixed small enemies being able to walk through laser fences

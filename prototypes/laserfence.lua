@@ -28,12 +28,24 @@ local post_sprite = {
 	}
 }
 
+local baseRange = settings.startup["laserfence-base-range"].value
+local addedRange = settings.startup["laserfence-added-range"].value
+
+function all4pipes(distance)
+	local pipe_connections = {}
+	for _,position in pairs({{0,1}, {0,-1}, {1,0}, {-1,0}}) do
+		table.insert(pipe_connections, {position = position, max_underground_distance = distance})
+	end
+	return pipe_connections
+end
+
 data:extend{
 	{
 		type = "electric-energy-interface",
 		name = "laserfence-post",
 		icon = modName.."/graphics/post-icon.png",
 		icon_size = 64,
+		localised_description = {"entity-description.laserfence-post", baseRange},
 		flags = {"placeable-neutral", "placeable-off-grid", "player-creation", "not-blueprintable"},
 		collision_box = {{-0.49, -0.49 - offset}, {0.49, 0.49 - offset}},
 		selection_box = {{-0.5, -0.5 - offset}, {0.5, 0.5 - offset}},
@@ -254,7 +266,7 @@ data:extend{
 		type = "pipe-to-ground",
 		name = "laserfence-connector",
 		localised_name = {"entity-name.laserfence-post"},
-		localised_description = {"entity-description.laserfence-post"},
+		localised_description = {"entity-description.laserfence-post", baseRange},
 		icon = modName.."/graphics/post-icon.png",
 		icon_size = 64,
 		flags = {"placeable-neutral", "player-creation"},
@@ -262,24 +274,9 @@ data:extend{
 		collision_mask = {"item-layer", "object-layer", "water-tile"}, -- disable collision
 		fluid_box = {
 			filter = "fluid-unknown",
-			pipe_connections = {
-				{
-					position = {0, 1},
-					max_underground_distance = 16,
-				},
-				{
-					position = {0, -1},
-					max_underground_distance = 16,
-				},
-				{
-					position = {1, 0},
-					max_underground_distance = 16,
-				},
-				{
-					position = {-1, 0},
-					max_underground_distance = 16,
-				},
-			},
+			-- As long as most-upgraded version, so we can always use this prototype for the placement
+			-- and the connection length will be limited by the end that has already been placed
+			pipe_connections = all4pipes(baseRange + 1 + 3 * addedRange),
 		},
 		pictures = {
 			up	= post_sprite,
@@ -299,4 +296,12 @@ data:extend{
 
 if not settings.startup["laserfence-solid-walls"].value then
 	data.raw["simple-entity"]["laserfence-beam"].collision_mask = {"item-layer", "object-layer", "water-tile"}
+end
+
+for i = 1,4 do
+	local name = "laserfence-connector-"..tostring(i)
+	local prototype = table.deepcopy(data.raw["pipe-to-ground"]["laserfence-connector"])
+	prototype.name = name
+	prototype.fluid_box.pipe_connections = all4pipes(baseRange + 1 + (i - 1) * addedRange)
+	data:extend{prototype}
 end
