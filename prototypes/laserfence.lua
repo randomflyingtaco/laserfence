@@ -30,6 +30,7 @@ local post_sprite = {
 
 local baseRange = settings.startup["laserfence-base-range"].value
 local addedRange = settings.startup["laserfence-added-range"].value
+local power = settings.startup["laserfence-power"].value
 
 function all4pipes(distance)
 	local pipe_connections = {}
@@ -58,29 +59,29 @@ data:extend{
 		mined_sound = {filename = "__base__/sound/deconstruct-bricks.ogg"},
 		vehicle_impact_sound = {filename = "__base__/sound/car-stone-impact.ogg", volume = 1.0},
 		working_sound =	{
-		  sound = {
-			filename = "__base__/sound/substation.ogg",
-			volume = 0.4
-		  },
-		  idle_sound = {
-			filename = "__base__/sound/accumulator-idle.ogg",
-			volume = 0.4
-		  },
-		  max_sounds_per_type = 3,
-		  audible_distance_modifier = 0.5,
-		  fade_in_ticks = 30,
-		  fade_out_ticks = 40,
-		  use_doppler_shift = false
+			sound = {
+				filename = "__base__/sound/substation.ogg",
+				volume = 0.4
+			},
+			idle_sound = {
+				filename = "__base__/sound/accumulator-idle.ogg",
+				volume = 0.4
+			},
+			max_sounds_per_type = 3,
+			audible_distance_modifier = 0.5,
+			fade_in_ticks = 30,
+			fade_out_ticks = 40,
+			use_doppler_shift = false
 		},
 		energy_source = {
 			type = "electric",
-			buffer_capacity = "2500kJ",
+			buffer_capacity = tostring(5 * power).."kJ",
 			usage_priority = "primary-input",
-			input_flow_limit = "1000kW",
+			input_flow_limit = tostring(2 * power).."kW",
 			output_flow_limit = "0kW",
 			drain = "0kW"
 		},
-		energy_usage = "500kW",
+		energy_usage = tostring(power).."kW",
 		--render_layer = "higher-object-under",
 		animation = {
 			layers = {
@@ -131,7 +132,7 @@ data:extend{
 		icon = modName.."/graphics/beam-icon.png",
 		icon_size = 64,
 		flags = {"placeable-neutral", "player-creation", "not-repairable"},
-		max_health = 200,
+		max_health = settings.startup["laserfence-health"].value,
 		healing_per_tick = 0.01,
 		is_military_target = true,
 		subgroup = "remnants",

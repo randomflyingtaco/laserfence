@@ -3,6 +3,8 @@ require("scripts/CnC_Walls") --Note, to make SonicWalls work / be passable
 local migration = require("scripts/migration")
 
 local debugText = settings.startup["laserfence-debug-text"].value
+local baseDamage = settings.startup["laserfence-base-damage"].value
+local beamScaling = settings.startup["laserfence-beam-weapon-scaling"].value
 local connectorNames = {"laserfence-connector-1", "laserfence-connector-2", "laserfence-connector-3", "laserfence-connector-4"}
 
 script.on_init(function()
@@ -82,10 +84,13 @@ end
 
 script.on_event(defines.events.on_script_trigger_effect, function(event)
 	--Liquid Seed trigger
-	if event.effect_id == "laserfence-reflect-damage" then
-		local multi = global.laserfenceDamageMulti[event.source_entity.force.name]
-		if debugText and event.target_entity then game.print("Dealing "..(10 * (1 + multi)).." reflect damage to "..event.target_entity.name) end
-		safeDamage(event.target_entity, 10 * (1 + multi))
+	if event.effect_id == "laserfence-reflect-damage" and baseDamage > 0 then
+		local multi = 0
+		if beamScaling then
+			multi = global.laserfenceDamageMulti[event.source_entity.force.name]
+		end
+		if debugText and event.target_entity then game.print("Dealing "..(baseDamage * (1 + multi)).." reflect damage to "..event.target_entity.name) end
+		safeDamage(event.target_entity, baseDamage * (1 + multi))
 	end
 end
 )
@@ -208,6 +213,12 @@ script.on_event({defines.events.on_research_finished, defines.events.on_research
 		for _, surface in pairs(game.surfaces) do
 			-- Swap pipe-to-ground to update range
 			for _, connector in pairs(surface.find_entities_filtered{name = connectorNames, force = force}) do
+				surface.create_entity{
+					name = "laserfence-connector-"..tostring(level),
+					force = force,
+					position = connector.position,
+					create_build_effect_smoke = false
+				}
 				connector.destroy()
 			end
 			-- Reconnect emitters

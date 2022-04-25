@@ -1,6 +1,7 @@
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.2
   Features:
+    - Added a ton of settings to let you balance Laser Fences however you want
     - Added new upgrade for increasing the maximum Laser Fence length
   Bugfixes:
     - Fixed crash that occurred when a fence and a post died on the same tick
