@@ -6,6 +6,7 @@ local debugText = settings.startup["laserfence-debug-text"].value
 local baseDamage = settings.startup["laserfence-base-damage"].value
 local beamScaling = settings.startup["laserfence-beam-weapon-scaling"].value
 local connectorNames = {"laserfence-connector", "laserfence-connector-0", "laserfence-connector-1", "laserfence-connector-2", "laserfence-connector-3"}
+local offset = 0.0625
 
 script.on_init(function()
 	global.laserfenceOnEntityDestroyed = {}
@@ -105,7 +106,7 @@ function registerEntity(entity)  -- Cache relevant information to global and reg
 end
 
 function registerObstruction(entity, node1, node2)  -- Cache relevant information to global and register
-	local entityInfo = {}  -- TODO restructure so multilple walls can be registered to the same obstruction, also do the conversion
+	local entityInfo = {}
 	entityInfo["node1"] = node1
 	entityInfo["node2"] = node2
 	for _, property in pairs({"name", "type", "position", "surface", "force"}) do
@@ -165,7 +166,7 @@ function on_new_entity(event)
 		-- Create actual emitter
 		local emitter = surface.create_entity{
 			name = "laserfence-post",
-			position = {position.x, position.y + 0.0625},
+			position = {position.x, position.y + offset},
 			force = force,
 			raise_built = true
 		}
@@ -187,7 +188,7 @@ function on_remove_entity(event)
 		local force = entity.force
 		if (entity.name == "laserfence-post") then
 			if surface and surface.valid then
-				for _, connector in pairs(surface.find_entities_filtered{name = connectorNames, position = {position.x, position.y - 0.0625}, force = force}) do
+				for _, connector in pairs(surface.find_entities_filtered{name = connectorNames, position = {position.x, position.y - offset}, force = force}) do
 					connector.destroy()
 				end
 			end
@@ -231,5 +232,17 @@ script.on_event({defines.events.on_force_created, defines.events.on_force_reset}
 	local multi = event.force.get_ammo_damage_modifier("laser") or 0
 	global.laserfenceDamageMulti[event.force.name] = multi
 	updateConnectorLevel(event.force)
+end
+)
+
+script.on_event(defines.events.on_forces_merged, function(event)
+	for _, globalName in pairs(global.laserfenceOnEntityDestroyed, global.laserfenceObstruction) do
+		for registration_number, entityInfo in pairs(globalName) do
+			if entityInfo.force.name == event.source_name then
+				globalName[registration_number].force = event.destination
+			end
+		end
+	end
+	updateConnectorLevel(event.destination)
 end
 )

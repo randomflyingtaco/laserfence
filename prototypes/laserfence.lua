@@ -90,7 +90,7 @@ data:extend{
 					priority = "extra-high",
 					frame_count = 32,
 					line_length = 16,
-					animation_speed = 0.00002,
+					animation_speed = 0.01 / power,
 					axially_symmetrical = false,
 					direction_count = 1,
 					width = 128,

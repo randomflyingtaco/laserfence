@@ -22,7 +22,7 @@ local min   = math.min
 --Returns array containing up to 4 entities that could connect to an SRF emitter at the given position
 --Assumes node_range, horz_wall, vert_wall, global.SRF_nodes
 function CnC_SonicWall_FindNodes(surf, pos, force, dir)
-	local node_range = baseRange + 1 + addedRange * (global.laserfenceRangeUpgradeLevel[force.name] - 1)
+	local node_range = baseRange + 1 + addedRange * global.laserfenceRangeUpgradeLevel[force.name]
 	local near_nodes = {nil, nil, nil, nil}
 	local near_dists = {node_range, node_range * -1, node_range, node_range * -1}
 	for _, entry in pairs(global.SRF_nodes) do
@@ -198,7 +198,7 @@ function CnC_SonicWall_MakeWall(surf, pos, dir, node)
 	
 	if not global.SRF_segments[surf.index][x][y] then
 		local wall = surf.create_entity{name="laserfence-beam", position=pos, force=node.force, move_stuck_players=true}
-		if not wall then error("Wall creation failed!") end
+		if not wall then error("Wall creation failed and not caught by TestWall. x: "..tostring(x).." y: "..tostring(y)) end
 		for _, entity in pairs(surf.find_entities_filtered{area = {{x, y}, {x + 0.9, y + 0.9}}, force = "enemy"}) do
 			safeDamage(entity, 9999)
 		end
@@ -224,7 +224,7 @@ function tryCnC_SonicWall_MakeWall(node1, node2)
 			ty = max(node1.position.y, that_pos.y) - 1
 			for y = sy, ty do
 				if not CnC_SonicWall_TestWall(node1.surface, {node1.position.x, y}, vert_wall, node1, node2) then
-					game.print("Failed at x: "..that_pos.x.." y: "..y)
+					if debugText then game.print("Failed at x: "..that_pos.x.." y: "..y) end
 					return
 				end
 			end
@@ -239,7 +239,7 @@ function tryCnC_SonicWall_MakeWall(node1, node2)
 			tx = max(node1.position.x, that_pos.x) - 1
 			for x = sx, tx do
 				if not CnC_SonicWall_TestWall(node1.surface, {x, node1.position.y}, horz_wall, node1, node2) then
-					game.print("Failed at x: "..x.." y: "..that_pos.y)
+					if debugText then game.print("Failed at x: "..x.." y: "..that_pos.y) end
 					return
 				end
 			end
@@ -300,6 +300,8 @@ function CnC_SonicWall_OnTick(event)
 			if ticks_rem <= 5 then
 				CnC_SonicWall_DeleteNode(low.emitter, cur_tick)  --Removes it from low power ticklist as well
 				CnC_SonicWall_AddNode(low.emitter, cur_tick)
+			elseif ticks_rem > 65 then
+				table.remove(global.SRF_low_power_ticklist, i)  -- Fixes issue where nodes would get re-checked forever
 			else
 				low.tick = cur_tick + ceil(ticks_rem)
 			end
