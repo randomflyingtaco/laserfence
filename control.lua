@@ -82,6 +82,9 @@ script.on_configuration_changed(function(event)
 					CnC_SonicWall_AddNode(post, game.tick)
 				end
 			end
+			for _, connector in pairs(surface.find_entities_filtered{name = connectorNames}) do
+				connector.destructible = false
+			end
 		end
 	end
 end)
@@ -191,12 +194,13 @@ function on_new_entity(event)
 	if string.sub(new_entity.name, 1, 20) == "laserfence-connector" then
 		-- Swap the generic pipe-to-ground to the correct length version
 		new_entity.destroy()
-		surface.create_entity{
+		local connector = surface.create_entity{
 			name = "laserfence-connector-"..tostring(global.laserfenceRangeUpgradeLevel[force.name]),
 			force = force,
 			position = position,
 			create_build_effect_smoke = false
 		}
+		connector.destructible = false
 		-- Create actual emitter
 		local emitter = surface.create_entity{
 			name = "laserfence-post",
@@ -225,6 +229,7 @@ function on_remove_entity(event)
 				local ghost = surface.find_entities_filtered{position = entity.position, ghost_name = entity.name}[1]
 				for _, connector in pairs(surface.find_entities_filtered{name = connectorNames, position = {position.x, position.y - offset}, force = force}) do
 					if ghost then
+						connector.destructible = true
 						connector.die()
 					else
 						connector.destroy()

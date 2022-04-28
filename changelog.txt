@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.3
+  Bugfixes:
+    - Fixed crash that occurred when revived laser fence posts were destroyed again (LuaEntity API call when LuaEntity was invalid. laserfence/scripts/CnC_Walls.lua:285)
+    - Fixed laser fence posts not showing correctly in blueprints/deconstruction plans
+    - Fixed laser fence posts not working after being revived by robots
+    - Fixed AOE damage sometimes causing laser fence posts to stop working and construction robots to get stuck trying to fix them
+---------------------------------------------------------------------------------------------------
 Version: 1.1.2
   Features:
     - Added a ton of settings to let you balance Laser Fences however you want

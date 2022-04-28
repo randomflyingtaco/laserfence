@@ -47,7 +47,7 @@ data:extend{
 		icon = modName.."/graphics/post-icon.png",
 		icon_size = 64,
 		localised_description = {"entity-description.laserfence-post", baseRange},
-		flags = {"placeable-neutral", "placeable-off-grid", "player-creation", "not-blueprintable"},
+		flags = {"placeable-neutral", "placeable-off-grid", "player-creation", "not-blueprintable", "not-deconstructable"},
 		collision_box = {{-0.49, -0.49 - offset}, {0.49, 0.49 - offset}},
 		selection_box = {{-0.5, -0.5 - offset}, {0.5, 0.5 - offset}},
 		minable = {mining_time = 0.5, result = "laserfence-post"},
@@ -133,7 +133,7 @@ data:extend{
 		icon_size = 64,
 		flags = {"placeable-neutral", "player-creation", "not-repairable"},
 		max_health = settings.startup["laserfence-health"].value,
-		healing_per_tick = 0.01,
+		healing_per_tick = 0.01,  -- Only works for trees
 		is_military_target = true,
 		subgroup = "remnants",
 		order = "a[remnants]",
@@ -204,28 +204,6 @@ data:extend{
 				draw_as_glow = true
 			}
 		},
-		-- resistances = {
-		-- 	{
-		-- 		type = "physical",
-		-- 		decrease = 5
-		-- 	},
-		-- 	{
-		-- 		type = "acid",
-		-- 		percent = 30
-		-- 	},
-		-- 	{
-		-- 		type = "explosion",
-		-- 		percent = 70
-		-- 	},
-		-- 	{
-		-- 		type = "fire",
-		-- 		percent = 100
-		-- 	},
-		-- 	{
-		-- 		type = "laser",
-		-- 		percent = 100
-		-- 	}
-		-- },
 		attack_reaction = {
 			{
 				range = 3,
