@@ -50,6 +50,40 @@ script.on_configuration_changed(function(event)
 			updateConnectorLevel(force)
 		end
 	end
+	if migration.upgradingToVersion(event, "1.1.3") then
+		for _, surface in pairs(game.surfaces) do
+			-- Convert ghosts
+			for _, ghost in pairs(surface.find_entities_filtered{ghost_name = "laserfence-post"}) do
+				local position = {x = ghost.position.x, y = ghost.position.y - offset}
+				local force = ghost.force.name
+				local connector = "laserfence-connector-"..tostring(global.laserfenceRangeUpgradeLevel[force])
+				ghost.destroy()
+				surface.create_entity{
+					name = "entity-ghost",
+					inner_name = connector,
+					force = force,
+					position = position,
+					create_build_effect_smoke = false
+				}
+			end
+			-- Re-pair missing connectors
+			for _, post in pairs(surface.find_entities_filtered{name = "laserfence-post"}) do
+				local position = {x = post.position.x, y = post.position.y - offset}
+				local force = post.force.name
+				local connector = "laserfence-connector-"..tostring(global.laserfenceRangeUpgradeLevel[force])
+				if not surface.find_entity(connector, position) then
+					surface.create_entity{
+						name = connector,
+						force = force,
+						position = position,
+						create_build_effect_smoke = false
+					}
+					registerEntity(post)
+					CnC_SonicWall_AddNode(post, game.tick)
+				end
+			end
+		end
+	end
 end)
 
 commands.add_command("laserfenceRebuild",
@@ -154,7 +188,7 @@ function on_new_entity(event)
 	local surface = new_entity.surface
 	local position = new_entity.position
 	local force = new_entity.force
-	if (new_entity.name == "laserfence-connector") then
+	if string.sub(new_entity.name, 1, 20) == "laserfence-connector" then
 		-- Swap the generic pipe-to-ground to the correct length version
 		new_entity.destroy()
 		surface.create_entity{
@@ -188,8 +222,16 @@ function on_remove_entity(event)
 		local force = entity.force
 		if (entity.name == "laserfence-post") then
 			if surface and surface.valid then
+				local ghost = surface.find_entities_filtered{position = entity.position, ghost_name = entity.name}[1]
 				for _, connector in pairs(surface.find_entities_filtered{name = connectorNames, position = {position.x, position.y - offset}, force = force}) do
-					connector.destroy()
+					if ghost then
+						connector.die()
+					else
+						connector.destroy()
+					end
+				end
+				if ghost then
+					ghost.destroy()
 				end
 			end
 			CnC_SonicWall_DeleteNode(entity, event.tick)

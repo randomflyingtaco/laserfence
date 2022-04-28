@@ -273,6 +273,8 @@ data:extend{
 		flags = {"placeable-neutral", "player-creation"},
 		collision_box = {{-0.49, -0.49}, {0.49, 0.49}},
 		collision_mask = {"item-layer", "object-layer", "water-tile"}, -- disable collision
+		selection_box = {{-0.5, -0.5}, {0.5, 0.5}},
+		placeable_by = {item = "laserfence-post", count = 1},
 		fluid_box = {
 			filter = "fluid-unknown",
 			-- As long as most-upgraded version, so we can always use this prototype for the placement
