@@ -127,7 +127,7 @@ data:extend{
 		}
 	},
 	{
-		type = "simple-entity",
+		type = "simple-entity-with-force",
 		name = "laserfence-beam",
 		icon = modName.."/graphics/beam-icon.png",
 		icon_size = 64,

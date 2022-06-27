@@ -87,6 +87,22 @@ script.on_configuration_changed(function(event)
 			end
 		end
 	end
+	if migration.upgradingToVersion(event, "1.1.4") then
+		game.print("Ran conversion for Laser Fence version 1.1.4")
+		global.SRF_nodes = {}
+		global.SRF_node_ticklist = {}
+		global.SRF_low_power_ticklist = {}
+		global.SRF_segments = {}
+
+		for _, surface in pairs(game.surfaces) do
+			for _, beam in pairs(surface.find_entities_filtered{name = "laserfence-beam"}) do
+				beam.destroy()
+			end
+			for _, post in pairs(surface.find_entities_filtered{name = "laserfence-post"}) do
+				CnC_SonicWall_AddNode(post, game.tick)
+			end
+		end
+	end
 end)
 
 commands.add_command("laserfenceRebuild",
