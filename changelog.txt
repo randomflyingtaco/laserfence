@@ -1,7 +1,11 @@
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.4
+  Features:
+    - Added Laser Fence Gates: a new technology to unlock a second type of emitter that forms gates instead of fences
+    - Added the ability to place Laser Fence Post in the middle of existing Laser Fences
   Bugfixes:
     - Fixed laser fence segments getting mistaken for rocks by biters and other mods
+    - Fixed some crashes that occurred when laser fences were destroyed
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.3
   Bugfixes:

@@ -25,6 +25,41 @@ data:extend{
 	},
 	{
 		type = "technology",
+		name = "laserfence-gate",
+		icons = {
+			{
+				icon = modName.."/graphics/256icon.png",
+				icon_size = 256,
+			},
+			{
+				icon = "__base__/graphics/icons/gate.png",
+				icon_size = 64,
+				icon_mipmaps = 4,
+				scale = 1.5,
+				shift = {80, -80}
+			}
+		},
+		order = "a-h-c",
+		effects = {
+			{
+				type = "unlock-recipe",
+				recipe = "laserfence-post-gate"
+			}
+		},
+		prerequisites = {"laserfence", "gate"},
+		unit = {
+			count = 100,
+			ingredients = {
+				{"automation-science-pack", 1},
+				{"logistic-science-pack", 1},
+				{"military-science-pack", 1},
+				{"chemical-science-pack", 1},
+			},
+			time = 30
+		}
+	},
+	{
+		type = "technology",
 		name = "laserfence-range-1",
 		icons = util.technology_icon_constant_range(modName.."/graphics/256icon.png"),
 		order = "a-h-d",
@@ -36,7 +71,7 @@ data:extend{
 		},
 		prerequisites = {"laserfence"},
 		unit = {
-			count = "100",
+			count = 100,
 			ingredients = {
 				{"automation-science-pack", 1},
 				{"logistic-science-pack", 1},
@@ -60,7 +95,7 @@ data:extend{
 		},
 		prerequisites = {"laserfence-range-1", "utility-science-pack"},
 		unit = {
-			count = "200",
+			count = 200,
 			ingredients = {
 				{"automation-science-pack", 1},
 				{"logistic-science-pack", 1},
@@ -85,7 +120,7 @@ data:extend{
 		},
 		prerequisites = {"laserfence-range-2", "space-science-pack"},
 		unit = {
-			count = "1000",
+			count = 1000,
 			ingredients = {
 				{"automation-science-pack", 1},
 				{"logistic-science-pack", 1},

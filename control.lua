@@ -5,7 +5,7 @@ local migration = require("scripts/migration")
 local debugText = settings.startup["laserfence-debug-text"].value
 local baseDamage = settings.startup["laserfence-base-damage"].value
 local beamScaling = settings.startup["laserfence-beam-weapon-scaling"].value
-local connectorNames = {"laserfence-connector", "laserfence-connector-0", "laserfence-connector-1", "laserfence-connector-2", "laserfence-connector-3"}
+local connectorNames = {"laserfence-connector", "laserfence-connector-0", "laserfence-connector-1", "laserfence-connector-2", "laserfence-connector-3", "laserfence-connector-gate"}
 local offset = 0.0625
 
 script.on_init(function()
@@ -187,13 +187,15 @@ function updateConnectorLevel(force)
 	for _, surface in pairs(game.surfaces) do
 		-- Swap pipe-to-ground to update range
 		for _, connector in pairs(surface.find_entities_filtered{name = connectorNames, force = force}) do
-			surface.create_entity{
-				name = "laserfence-connector-"..tostring(level),
-				force = force,
-				position = connector.position,
-				create_build_effect_smoke = false
-			}
-			connector.destroy()
+			if connector.name ~= "laserfence-connector-gate" then
+				surface.create_entity{
+					name = "laserfence-connector-"..tostring(level),
+					force = force,
+					position = connector.position,
+					create_build_effect_smoke = false
+				}
+				connector.destroy()
+			end
 		end
 		-- Reconnect emitters
 		for _, post in pairs(surface.find_entities_filtered{name = "laserfence-post"}) do
@@ -207,7 +209,18 @@ function on_new_entity(event)
 	local surface = new_entity.surface
 	local position = new_entity.position
 	local force = new_entity.force
-	if string.sub(new_entity.name, 1, 20) == "laserfence-connector" then
+	if new_entity.name == "laserfence-connector-gate" then
+		new_entity.destructible = false
+		-- Create actual emitter
+		local emitter = surface.create_entity{
+			name = "laserfence-post-gate",
+			position = {position.x, position.y + offset},
+			force = force,
+			raise_built = true
+		}
+		registerEntity(emitter)
+		CnC_SonicWall_AddNode(emitter, event.tick)
+	elseif string.sub(new_entity.name, 1, 20) == "laserfence-connector" then
 		-- Swap the generic pipe-to-ground to the correct length version
 		new_entity.destroy()
 		local connector = surface.create_entity{
@@ -240,7 +253,7 @@ function on_remove_entity(event)
 		local surface = entity.surface
 		local position = entity.position
 		local force = entity.force
-		if (entity.name == "laserfence-post") then
+		if (entity.name == "laserfence-post") or (entity.name == "laserfence-post-gate") then
 			if surface and surface.valid then
 				local ghost = surface.find_entities_filtered{position = entity.position, ghost_name = entity.name}[1]
 				for _, connector in pairs(surface.find_entities_filtered{name = connectorNames, position = {position.x, position.y - offset}, force = force}) do
@@ -275,7 +288,7 @@ end
 script.on_event(defines.events.on_entity_destroyed, on_remove_entity)
 
 script.on_event(defines.events.on_entity_died, function(event)
-	if event.entity and (event.entity.name == "laserfence-beam") then
+	if event.entity and ((event.entity.name == "laserfence-beam") or (event.entity.name == "laserfence-beam-gate")) then
 		CnC_SonicWall_DestroyedWall(event.entity)
 	end
 end

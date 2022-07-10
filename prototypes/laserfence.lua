@@ -28,6 +28,50 @@ local post_sprite = {
 	}
 }
 
+local gate_post_sprite = {
+	layers = {
+		{
+			filename = "__base__/graphics/entity/gate/gate-vertical.png",
+			height = 62,
+			width = 38,
+			x = 38 * 7,
+			y = 62,
+			shift = {
+				0,
+				-0.4375
+			},
+		},
+		{
+			filename = "__base__/graphics/entity/gate/gate-horizontal.png",
+			height = 48,
+			width = 34,
+			x = 7 * 34,
+			y = 48,
+			shift = {
+				0,
+				-0.125
+			}
+		},
+		post_sprite.layers[1],
+		post_sprite.layers[2]
+	}
+}
+
+local gate_icons = {
+	{
+		icon = modName.."/graphics/post-icon.png",
+		icon_size = 64,
+		scale = 1/2,
+	},
+	{
+		icon = "__base__/graphics/icons/gate.png",
+		icon_size = 64,
+		icon_mipmaps = 4,
+		scale = 3/16,
+		shift = {10, -10},
+	},
+}
+
 local baseRange = settings.startup["laserfence-base-range"].value
 local addedRange = settings.startup["laserfence-added-range"].value
 local power = settings.startup["laserfence-power"].value
@@ -52,6 +96,92 @@ data:extend{
 		selection_box = {{-0.5, -0.5 - offset}, {0.5, 0.5 - offset}},
 		minable = {mining_time = 0.5, result = "laserfence-post"},
 		placeable_by = {item = "laserfence-post", count = 1},
+		fast_replaceable_group = "laserfence",
+		max_health = 200,
+		repair_speed_modifier = 1.5,
+		corpse = "wall-remnants",
+		repair_sound = {filename = "__base__/sound/manual-repair-simple.ogg"},
+		mined_sound = {filename = "__base__/sound/deconstruct-bricks.ogg"},
+		vehicle_impact_sound = {filename = "__base__/sound/car-stone-impact.ogg", volume = 1.0},
+		working_sound =	{
+			sound = {
+				filename = "__base__/sound/substation.ogg",
+				volume = 0.4
+			},
+			idle_sound = {
+				filename = "__base__/sound/accumulator-idle.ogg",
+				volume = 0.4
+			},
+			max_sounds_per_type = 3,
+			audible_distance_modifier = 0.5,
+			fade_in_ticks = 30,
+			fade_out_ticks = 40,
+			use_doppler_shift = false
+		},
+		energy_source = {
+			type = "electric",
+			buffer_capacity = tostring(5 * power).."kJ",
+			usage_priority = "primary-input",
+			input_flow_limit = tostring(2 * power).."kW",
+			output_flow_limit = "0kW",
+			drain = "0kW"
+		},
+		energy_usage = tostring(power).."kW",
+		--render_layer = "higher-object-under",
+		animation = {
+			layers = {
+				{
+					filename = modName.."/graphics/post-animation.png",
+					priority = "extra-high",
+					frame_count = 32,
+					line_length = 16,
+					animation_speed = 0.01 / power,
+					axially_symmetrical = false,
+					direction_count = 1,
+					width = 128,
+					height = 256,
+					scale = 0.3,
+					shift = {0, -0.7}
+				}
+			}
+		},
+		resistances = {
+			{
+				type = "physical",
+				decrease = 3,
+				percent = 20
+			},
+			{
+				type = "impact",
+				decrease = 45,
+				percent = 60
+			},
+			{
+				type = "explosion",
+				decrease = 10,
+				percent = 30
+			},
+			{
+				type = "fire",
+				percent = 30
+			},
+			{
+				type = "laser",
+				percent = 80
+			}
+		}
+	},
+	{
+		type = "electric-energy-interface",
+		name = "laserfence-post-gate",
+		icons = gate_icons,
+		localised_description = {"entity-description.laserfence-post-gate", baseRange},
+		flags = {"placeable-neutral", "placeable-off-grid", "player-creation", "not-blueprintable", "not-deconstructable"},
+		collision_box = {{-0.49, -0.49 - offset}, {0.49, 0.49 - offset}},
+		selection_box = {{-0.5, -0.5 - offset}, {0.5, 0.5 - offset}},
+		minable = {mining_time = 0.5, result = "laserfence-post-gate"},
+		placeable_by = {item = "laserfence-post-gate", count = 1},
+		fast_replaceable_group = "laserfence",
 		max_health = 200,
 		repair_speed_modifier = 1.5,
 		corpse = "wall-remnants",
@@ -133,13 +263,10 @@ data:extend{
 		icon_size = 64,
 		flags = {"placeable-neutral", "player-creation", "not-repairable"},
 		max_health = settings.startup["laserfence-health"].value,
-		healing_per_tick = 0.01,  -- Only works for trees
-		is_military_target = true,
-		subgroup = "remnants",
-		order = "a[remnants]",
 		selection_box = {{-0.5, -0.5}, {0.5, 0.5}},
 		selection_priority = 1,
 		collision_box = {{-0.49, -0.49}, {0.49, 0.49}},
+		fast_replaceable_group = "laserfence",
 		created_effect = {
 			type = "direct",
 			action_delivery = {
@@ -242,6 +369,165 @@ data:extend{
 		},
 	},
 	{
+		type = "gate",
+		name = "laserfence-beam-gate",
+		icon = modName.."/graphics/beam-icon.png",
+		icon_size = 64,
+		flags = {"placeable-neutral", "player-creation", "not-repairable"},
+		max_health = settings.startup["laserfence-health"].value,
+		is_military_target = true,
+		selection_box = {{-0.5, -0.5}, {0.5, 0.5}},
+		selection_priority = 1,
+		collision_box = {{-0.29, -0.29}, {0.29, 0.29}},
+		collision_mask = {},
+		fast_replaceable_group = "laserfence",
+		integration_patch_render_layer = "lower-object-above-shadow",
+		render_layer = "lower-object-above-shadow",
+		activation_distance = 4,
+		corpse = "gate-remnants",
+		dying_explosion = "gate-explosion",
+		open_sound = {filename = "__base__/sound/silence-1sec.ogg"},
+		close_sound = {filename = "__base__/sound/silence-1sec.ogg"},
+		opening_speed = 1/16,
+		timeout_to_close = 5,
+		fadeout_interval = 15,
+		horizontal_animation = {
+			filename = "__base__/graphics/entity/gate/gate-horizontal.png",
+			height = 48,
+			width = 34,
+			x = 7 * 34,
+			y = 48,
+			shift = {
+				0,
+				-0.125
+			},
+		},
+		horizontal_rail_base = {
+			filename = "__base__/graphics/entity/gate/gate-rail-base-horizontal.png",
+			height = 54,
+			width = 66,
+			x = 7 * 66,
+			y = 54,
+			shift = {
+				0,
+				0.0625
+			},
+		},
+		horizontal_rail_animation_left = {
+			filename = "__base__/graphics/entity/gate/gate-rail-horizontal-left.png",
+			height = 40,
+			width = 34,
+			x = 7 * 34,
+			y = 40,
+			shift = {
+				0,
+				-0.25
+			},
+		},
+		horizontal_rail_animation_right = {
+			filename = "__base__/graphics/entity/gate/gate-rail-horizontal-right.png",
+			height = 40,
+			width = 34,
+			x = 7 * 34,
+			y = 40,
+			shift = {
+				0,
+				-0.25
+			},
+		},
+		vertical_animation = {
+			filename = "__base__/graphics/entity/gate/gate-vertical.png",
+			height = 62,
+			width = 38,
+			x = 38 * 7,
+			y = 62,
+			shift = {
+				0,
+				-0.4375
+			},
+		},
+		vertical_rail_base = {
+			filename = "__base__/graphics/entity/gate/gate-rail-base-vertical.png",
+			height = 66,
+			width = 68,
+			x = 68 * 7,
+			y = 66,
+			shift = {
+				0,
+				0
+			},
+		},
+		vertical_rail_animation_left = {
+			filename = "__base__/graphics/entity/gate/gate-rail-vertical-left.png",
+			height = 62,
+			width = 22,
+			x = 22 * 7,
+			y =62,
+			shift = {
+				0,
+				-0.4375
+			},
+		},
+		vertical_rail_animation_right = {
+			filename = "__base__/graphics/entity/gate/gate-rail-vertical-right.png",
+			height = 62,
+			width = 22,
+			x = 22 * 7,
+			y = 62,
+			shift = {
+				0,
+				-0.4375
+			},
+		},
+		wall_patch = {
+			filename = "__base__/graphics/entity/gate/gate-wall-patch.png",
+			height = 48,
+			width = 34,
+			x = 34 * 7,
+			y = 48,
+			shift = {
+				0,
+				0.375
+			},
+		},
+		attack_reaction = {
+			{
+				range = 3,
+				reaction_modifier = 1,
+				damage_type = "physical",
+				action = {
+					type = "direct",
+					action_delivery = {
+						type = "instant",
+						target_effects = {
+							{
+								type = "script",
+								effect_id = "laserfence-reflect-damage"
+							}
+						}
+					}
+				}
+			},
+			{
+				range = 3,
+				reaction_modifier = 1,
+				damage_type = "acid",
+				action = {
+					type = "direct",
+					action_delivery = {
+						type = "instant",
+						target_effects = {
+							{
+								type = "script",
+								effect_id = "laserfence-reflect-damage"
+							}
+						}
+					}
+				}
+			}
+		},
+	},
+	{
 		type = "pipe-to-ground",
 		name = "laserfence-connector",
 		localised_name = {"entity-name.laserfence-post"},
@@ -253,6 +539,7 @@ data:extend{
 		collision_mask = {"item-layer", "object-layer", "water-tile"}, -- disable collision
 		selection_box = {{-0.5, -0.5}, {0.5, 0.5}},
 		placeable_by = {item = "laserfence-post", count = 1},
+		fast_replaceable_group = "laserfence",
 		fluid_box = {
 			filter = "fluid-unknown",
 			-- As long as most-upgraded version, so we can always use this prototype for the placement
@@ -260,10 +547,33 @@ data:extend{
 			pipe_connections = all4pipes(baseRange + 1 + 3 * addedRange),
 		},
 		pictures = {
-			up	= post_sprite,
+			up    = post_sprite,
 			down  = post_sprite,
 			left  = post_sprite,
 			right = post_sprite,
+		},
+	},
+	{
+		type = "pipe-to-ground",
+		name = "laserfence-connector-gate",
+		localised_name = {"entity-name.laserfence-post-gate"},
+		localised_description = {"entity-description.laserfence-post-gate", baseRange},
+		icons = gate_icons,
+		flags = {"placeable-neutral", "player-creation"},
+		collision_box = {{-0.49, -0.49}, {0.49, 0.49}},
+		collision_mask = {"item-layer", "object-layer", "water-tile"}, -- disable collision
+		selection_box = {{-0.5, -0.5}, {0.5, 0.5}},
+		placeable_by = {item = "laserfence-post-gate", count = 1},
+		fast_replaceable_group = "laserfence",
+		fluid_box = {
+			filter = "fluid-unknown",
+			pipe_connections = all4pipes(baseRange + 1),  -- This version doesn't scale with upgrades
+		},
+		pictures = {
+			up	  = gate_post_sprite,
+			down  = gate_post_sprite,
+			left  = gate_post_sprite,
+			right = gate_post_sprite,
 		},
 	},
 	{
@@ -276,8 +586,16 @@ data:extend{
 }
 
 if not settings.startup["laserfence-solid-walls"].value then
-	data.raw["simple-entity"]["laserfence-beam"].collision_mask = {"item-layer", "object-layer", "water-tile"}
+	data.raw["simple-entity-with-force"]["laserfence-beam"].collision_mask = {"item-layer", "object-layer", "water-tile"}
 end
+
+local unselectable_beam = util.table.deepcopy(data.raw["simple-entity-with-force"]["laserfence-beam"])
+unselectable_beam.type = "simple-entity-with-owner"  -- Since it isn't a military target
+unselectable_beam.name = "laserfence-beam-unselectable"
+unselectable_beam.selection_box = nil
+unselectable_beam.attack_reaction = nil
+unselectable_beam.secondary_draw_order = 2
+data:extend{unselectable_beam}
 
 for i = 0,3 do
 	local name = "laserfence-connector-"..tostring(i)
