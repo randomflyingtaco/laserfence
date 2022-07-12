@@ -133,4 +133,79 @@ data:extend{
 		},
 		upgrade = true,
 	},
+	{
+		type = "technology",
+		name = "laserfence-efficiency-1",
+		icons = util.technology_icon_constant_speed(modName.."/graphics/256icon.png"),
+		order = "a-h-d",
+		effects = {
+			{
+				type = "nothing",
+				effect_description = {"technology-description.laserfence-efficiency-effect", "25%"}
+			}
+		},
+		prerequisites = {"laserfence"},
+		unit = {
+			count = 100,
+			ingredients = {
+				{"automation-science-pack", 1},
+				{"logistic-science-pack", 1},
+				{"military-science-pack", 1},
+				{"chemical-science-pack", 1},
+			},
+			time = 30
+		},
+		upgrade = true,
+	},
+	{
+		type = "technology",
+		name = "laserfence-efficiency-2",
+		icons = util.technology_icon_constant_speed(modName.."/graphics/256icon.png"),
+		order = "a-h-d",
+		effects = {
+			{
+				type = "nothing",
+				effect_description = {"technology-description.laserfence-efficiency-effect", "25%"}
+			}
+		},
+		prerequisites = {"laserfence-efficiency-1", "utility-science-pack"},
+		unit = {
+			count = 200,
+			ingredients = {
+				{"automation-science-pack", 1},
+				{"logistic-science-pack", 1},
+				{"military-science-pack", 1},
+				{"chemical-science-pack", 1},
+				{"utility-science-pack", 1},
+			},
+			time = 30
+		},
+		upgrade = true,
+	},
+	{
+		type = "technology",
+		name = "laserfence-efficiency-3",
+		icons = util.technology_icon_constant_speed(modName.."/graphics/256icon.png"),
+		order = "a-h-d",
+		effects = {
+			{
+				type = "nothing",
+				effect_description = {"technology-description.laserfence-efficiency-effect", "25%"}
+			}
+		},
+		prerequisites = {"laserfence-efficiency-2", "space-science-pack"},
+		unit = {
+			count = 1000,
+			ingredients = {
+				{"automation-science-pack", 1},
+				{"logistic-science-pack", 1},
+				{"military-science-pack", 1},
+				{"chemical-science-pack", 1},
+				{"utility-science-pack", 1},
+				{"space-science-pack", 1},
+			},
+			time = 30
+		},
+		upgrade = true,
+	},
 }

@@ -74,7 +74,8 @@ local gate_icons = {
 
 local baseRange = settings.startup["laserfence-base-range"].value
 local addedRange = settings.startup["laserfence-added-range"].value
-local power = settings.startup["laserfence-power"].value
+local basePower = settings.startup["laserfence-power"].value
+local segmentPower = settings.startup["laserfence-segment-power"].value
 
 function all4pipes(distance)
 	local pipe_connections = {}
@@ -90,7 +91,7 @@ data:extend{
 		name = "laserfence-post",
 		icon = modName.."/graphics/post-icon.png",
 		icon_size = 64,
-		localised_description = {"entity-description.laserfence-post", baseRange},
+		localised_description = {"entity-description.laserfence-post", baseRange, basePower, segmentPower},
 		flags = {"placeable-neutral", "placeable-off-grid", "player-creation", "not-blueprintable", "not-deconstructable"},
 		collision_box = {{-0.49, -0.49 - offset}, {0.49, 0.49 - offset}},
 		selection_box = {{-0.5, -0.5 - offset}, {0.5, 0.5 - offset}},
@@ -120,13 +121,13 @@ data:extend{
 		},
 		energy_source = {
 			type = "electric",
-			buffer_capacity = tostring(5 * power).."kJ",
+			buffer_capacity = tostring(5 * basePower).."kJ",
 			usage_priority = "primary-input",
-			input_flow_limit = tostring(2 * power).."kW",
+			input_flow_limit = tostring(basePower + 2 * (baseRange + 3 * addedRange) * segmentPower).."kW",
 			output_flow_limit = "0kW",
 			drain = "0kW"
 		},
-		energy_usage = tostring(power).."kW",
+		energy_usage = tostring(basePower).."kW",
 		--render_layer = "higher-object-under",
 		animation = {
 			layers = {
@@ -135,7 +136,7 @@ data:extend{
 					priority = "extra-high",
 					frame_count = 32,
 					line_length = 16,
-					animation_speed = 0.01 / power,
+					animation_speed = 0.02 / basePower,
 					axially_symmetrical = false,
 					direction_count = 1,
 					width = 128,
@@ -205,13 +206,13 @@ data:extend{
 		},
 		energy_source = {
 			type = "electric",
-			buffer_capacity = tostring(5 * power).."kJ",
+			buffer_capacity = tostring(5 * basePower).."kJ",
 			usage_priority = "primary-input",
-			input_flow_limit = tostring(2 * power).."kW",
+			input_flow_limit = tostring(basePower + 2 * (baseRange + 3 * addedRange) * segmentPower).."kW",
 			output_flow_limit = "0kW",
 			drain = "0kW"
 		},
-		energy_usage = tostring(power).."kW",
+		energy_usage = tostring(basePower).."kW",
 		--render_layer = "higher-object-under",
 		animation = {
 			layers = {
@@ -220,7 +221,7 @@ data:extend{
 					priority = "extra-high",
 					frame_count = 32,
 					line_length = 16,
-					animation_speed = 0.01 / power,
+					animation_speed = 0.02 / basePower,
 					axially_symmetrical = false,
 					direction_count = 1,
 					width = 128,

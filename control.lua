@@ -13,10 +13,12 @@ script.on_init(function()
 	global.laserfenceObstruction = {}
 	global.laserfenceDamageMulti = {}
 	global.laserfenceRangeUpgradeLevel = {}
+	global.laserfenceEfficiencyUpgradeLevel = {}
 	for name, force in pairs(game.forces) do
 		local multi = force.get_ammo_damage_modifier("laser") or 0
 		global.laserfenceDamageMulti[name] = multi
 		global.laserfenceRangeUpgradeLevel[name] = 0
+		global.laserfenceEfficiencyUpgradeLevel[name] = 0
 	end
 	CnC_SonicWall_OnInit()
 end)
@@ -93,6 +95,10 @@ script.on_configuration_changed(function(event)
 		global.SRF_node_ticklist = {}
 		global.SRF_low_power_ticklist = {}
 		global.SRF_segments = {}
+		global.laserfenceEfficiencyUpgradeLevel = {}
+		for _, force in pairs(game.forces) do
+			updateEfficiencyLevel(force)
+		end
 
 		for _, surface in pairs(game.surfaces) do
 			for _, beam in pairs(surface.find_entities_filtered{name = "laserfence-beam"}) do
@@ -109,12 +115,28 @@ commands.add_command("laserfenceRebuild",
 	"Update globals",
 	function()
 		global.SRF_nodes = {}
+		global.SRF_node_ticklist = {}
+		global.SRF_low_power_ticklist = {}
+		global.SRF_segments = {}
 		for _, surface in pairs(game.surfaces) do
-			for _, srf in pairs(surface.find_entities_filtered{name = "laserfence-post"}) do
-				table.insert(global.SRF_nodes, {emitter = srf, position = srf.position})
+			for _, beam in pairs(surface.find_entities_filtered{name = {"laserfence-beam", "laserfence-beam-gate"}}) do
+				beam.destroy()
+			end
+			for _, post in pairs(surface.find_entities_filtered{name = {"laserfence-post", "laserfence-post-gate"}}) do
+				CnC_SonicWall_AddNode(post, game.tick)
 			end
 		end
 		game.player.print("Found " .. #global.SRF_nodes .. " laser fence posts")
+		
+		global.laserfenceDamageMulti = {}
+		global.laserfenceRangeUpgradeLevel = {}
+		global.laserfenceEfficiencyUpgradeLevel = {}
+		for _, force in pairs(game.forces) do
+			local multi = force.get_ammo_damage_modifier("laser") or 0
+			global.laserfenceDamageMulti[force.name] = multi
+			updateConnectorLevel(force)
+			updateEfficiencyLevel(force)
+		end
 	end
 )
 
@@ -200,6 +222,24 @@ function updateConnectorLevel(force)
 		-- Reconnect emitters
 		for _, post in pairs(surface.find_entities_filtered{name = "laserfence-post"}) do
 			CnC_SonicWall_AddNode(post, game.tick)
+		end
+	end
+end
+
+function updateEfficiencyLevel(force)
+	-- Update global
+	local level = 0
+	for i = 3,1,-1 do
+		if force.technologies["laserfence-efficiency-"..tostring(i)].researched then
+			level = i
+			break
+		end
+	end
+	global.laserfenceEfficiencyUpgradeLevel[force.name] = level
+
+	for _, surface in pairs(game.surfaces) do
+		for _, emitter in pairs(surface.find_entities_filtered{name = {"laserfence-post", "laserfence-post-gate"}, force = force}) do
+			CnC_SonicWall_updatePowerUsage(emitter)
 		end
 	end
 end
@@ -300,6 +340,8 @@ script.on_event({defines.events.on_research_finished, defines.events.on_research
 	global.laserfenceDamageMulti[force.name] = multi
 	if string.sub(event.research.name, 1, 16) == "laserfence-range" then
 		updateConnectorLevel(force)
+	elseif string.sub(event.research.name, 1, 21) == "laserfence-efficiency" then
+		updateEfficiencyLevel(force)
 	end
 end
 )
@@ -308,6 +350,7 @@ script.on_event({defines.events.on_force_created, defines.events.on_force_reset}
 	local multi = event.force.get_ammo_damage_modifier("laser") or 0
 	global.laserfenceDamageMulti[event.force.name] = multi
 	updateConnectorLevel(event.force)
+	updateEfficiencyLevel(event.force)
 end
 )
 
@@ -320,5 +363,6 @@ script.on_event(defines.events.on_forces_merged, function(event)
 		end
 	end
 	updateConnectorLevel(event.destination)
+	updateEfficiencyLevel(event.destination)
 end
 )

@@ -40,16 +40,25 @@ data:extend{
 		order = "c-b",
 		default_value = 3,
 		minimum_value = 1,
-		maximum_value = 50
+		maximum_value = 50  --Max underground pipe length is 255, so need (base + 3 * added) < 255 to not crash
 	},
 	{
 		type = "int-setting",
 		name = "laserfence-power",
 		setting_type = "startup",
 		order = "d-a",
-		default_value = 500,
+		default_value = 400,
 		minimum_value = 1,
 		maximum_value = 50000
+	},
+	{
+		type = "int-setting",
+		name = "laserfence-segment-power",
+		setting_type = "startup",
+		order = "d-a",
+		default_value = 10,
+		minimum_value = 0,
+		maximum_value = 1000
 	},
 	{
 		type = "bool-setting",

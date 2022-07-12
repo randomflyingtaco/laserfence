@@ -3,6 +3,8 @@ Version: 1.1.4
   Features:
     - Added Laser Fence Gates: a new technology to unlock a second type of emitter that forms gates instead of fences
     - Added the ability to place Laser Fence Post in the middle of existing Laser Fences
+    - Reworked power costs to scale based on the length of Laser Fences
+    - Added Laser Fence Energy Efficiency upgrades that reduce the base power consumption of Laser Fence posts
   Bugfixes:
     - Fixed laser fence segments getting mistaken for rocks by biters and other mods
     - Fixed some crashes that occurred when laser fences were destroyed

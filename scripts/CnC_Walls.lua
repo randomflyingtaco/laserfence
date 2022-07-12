@@ -65,6 +65,7 @@ end
 function CnC_SonicWall_AddNode(entity, tick)
 	table.insert(global.SRF_nodes, {emitter = entity, position = entity.position})
 	table.insert(global.SRF_node_ticklist, {emitter = entity, position = entity.position, tick = tick + ceil(entity.electric_buffer_size / entity.electric_input_flow_limit)})
+	CnC_SonicWall_updatePowerUsage(entity)
 	CnC_SonicWall_DisableNode(entity)  --Destroy any walls that went through where the wall was placed so it can calculate new walls
 end
 
@@ -92,6 +93,8 @@ function CnC_SonicWall_DisableNode(entity)
 			tx = tx + dir.x
 			ty = ty + dir.y
 		end
+		local connectedEmitter = surf.find_entities_filtered{name = {"laserfence-post", "laserfence-post-gate"}, position = {tx + 0.5, ty + 0.5}}[1]
+		CnC_SonicWall_updatePowerUsage(connectedEmitter)
 	end
 	--Also destroy any wall that is on top of the node
 	if global.SRF_segments[surf.index] and global.SRF_segments[surf.index][x] and global.SRF_segments[surf.index][x][y] then
@@ -165,6 +168,7 @@ function CnC_SonicWall_DestroyedWall(entity)
 			local post = surf.find_entities_filtered{name = {"laserfence-post", "laserfence-post-gate"}, position = {tx + 0.5, ty + 0.5625}}[1]
 			if post then
 				post.energy = 0.2 * post.electric_buffer_size
+				CnC_SonicWall_updatePowerUsage(post)
 				table.insert(global.SRF_node_ticklist, {emitter = post, position = post.position, tick = game.tick + ceil(post.electric_buffer_size / post.electric_input_flow_limit)})
 			end
 		end
@@ -275,6 +279,34 @@ function tryCnC_SonicWall_MakeWall(node1, node2)
 				CnC_SonicWall_MakeWall(node1.surface, {x, node1.position.y}, horz_wall, node1.force, gate_mode)
 			end
 		end
+	end
+	CnC_SonicWall_updatePowerUsage(node1)
+	CnC_SonicWall_updatePowerUsage(node2)
+end
+
+function CnC_SonicWall_updatePowerUsage(emitter)
+	if find_value_in_table(global.SRF_nodes, emitter and emitter.position, "position") then
+		local segmentCount = 0
+		local surf = emitter.surface
+		local x = floor(emitter.position.x)
+		local y = floor(emitter.position.y)
+		for _, dir in pairs(dir_mods) do
+			local tx = x + dir.x
+			local ty = y + dir.y
+			while global.SRF_segments[surf.index] and global.SRF_segments[surf.index][tx] and global.SRF_segments[surf.index][tx][ty] do
+				local wall = global.SRF_segments[surf.index][tx][ty]
+				if bit32.band(wall[1], dir.variation) > 0 then
+					segmentCount = segmentCount + 1
+				end
+				tx = tx + dir.x
+				ty = ty + dir.y
+			end
+		end
+		local efficiencyLevel = global.laserfenceEfficiencyUpgradeLevel[emitter.force.name]
+		local basePower = settings.startup["laserfence-power"].value * 1000 / 60  -- Convert kW/s to W/tick
+		local segmentPower = settings.startup["laserfence-segment-power"].value * 1000 / 60
+		emitter.power_usage = (basePower * (1 - 0.25 * efficiencyLevel)) + (segmentPower * segmentCount / 2)  -- Half the segment cost goes to each emitter
+		if debugText then game.print("Updated emitter at x: "..x.." y: "..y.." to consume "..tostring((emitter.power_usage)*60/1000).."kW to power its "..segmentCount.." segments|"..math.random()) end
 	end
 end
 
