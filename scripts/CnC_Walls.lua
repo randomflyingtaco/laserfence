@@ -376,25 +376,31 @@ function CnC_SonicWall_OnTick(event)
 	end
 
 	-- Manage gate hybrid entities
-	for _, surface in pairs(game.surfaces) do
-		for _, gate in pairs(surface.find_entities_filtered{name = "laserfence-beam-gate"}) do
-			local beam = surface.find_entity("laserfence-beam-unselectable", gate.position)
-			if gate.is_opening() or gate.is_opened() then
-				if beam then
-					beam.destroy()
-				end
-			else
-				if not beam then
-					beam = surface.create_entity{
-						name = "laserfence-beam-unselectable",
-						force = gate.force,
-						position = gate.position
-					}
-					beam.destructible = false
-					if gate.direction == defines.direction.east then
-						beam.graphics_variation = horz_wall
+	for index, xs in pairs(global.SRF_segments) do
+		for _, ys in pairs(xs) do
+			for _, wall in pairs(ys) do
+				local gate = wall[2]
+				if gate and gate.valid and (gate.name == "laserfence-beam-gate") then
+					local surface = game.surfaces[index]
+					local beam = surface.find_entity("laserfence-beam-unselectable", gate.position)
+					if gate.is_opening() or gate.is_opened() then
+						if beam then
+							beam.destroy()
+						end
 					else
-						beam.graphics_variation = vert_wall
+						if not beam then
+							beam = surface.create_entity{
+								name = "laserfence-beam-unselectable",
+								force = gate.force,
+								position = gate.position
+							}
+							beam.destructible = false
+							if gate.direction == defines.direction.east then
+								beam.graphics_variation = horz_wall
+							else
+								beam.graphics_variation = vert_wall
+							end
+						end
 					end
 				end
 			end

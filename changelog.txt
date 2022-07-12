@@ -1,4 +1,8 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.5
+  Bugfixes:
+    - Fixed performance issue for large save files
+---------------------------------------------------------------------------------------------------
 Version: 1.1.4
   Features:
     - Added Laser Fence Gates: a new technology to unlock a second type of emitter that forms gates instead of fences
