@@ -56,7 +56,6 @@ script.on_configuration_changed(function(event)
 		for _, surface in pairs(game.surfaces) do
 			-- Convert ghosts
 			for _, ghost in pairs(surface.find_entities_filtered{ghost_name = "laserfence-post"}) do
-				local position = {x = ghost.position.x, y = ghost.position.y - offset}
 				local force = ghost.force.name
 				local connector = "laserfence-connector-"..tostring(global.laserfenceRangeUpgradeLevel[force])
 				ghost.destroy()
@@ -64,13 +63,13 @@ script.on_configuration_changed(function(event)
 					name = "entity-ghost",
 					inner_name = connector,
 					force = force,
-					position = position,
+					position = connectorPosition(ghost.position),
 					create_build_effect_smoke = false
 				}
 			end
 			-- Re-pair missing connectors
 			for _, post in pairs(surface.find_entities_filtered{name = "laserfence-post"}) do
-				local position = {x = post.position.x, y = post.position.y - offset}
+				local position = connectorPosition(post.position)
 				local force = post.force.name
 				local connector = "laserfence-connector-"..tostring(global.laserfenceRangeUpgradeLevel[force])
 				if not surface.find_entity(connector, position) then
@@ -106,6 +105,16 @@ script.on_configuration_changed(function(event)
 			end
 			for _, post in pairs(surface.find_entities_filtered{name = "laserfence-post"}) do
 				CnC_SonicWall_AddNode(post, game.tick)
+			end
+		end
+	end
+	if migration.upgradingToVersion(event, "1.1.6") then
+		--Clean up posts without connectors
+		for _, surface in pairs(game.surfaces) do
+			for _, post in pairs(surface.find_entities_filtered{name = {"laserfence-post", "laserfence-post-gate"}}) do
+				if not surface.find_entities_filtered{name = connectorNames, position = connectorPosition(post.position)} then
+					post.destroy()
+				end
 			end
 		end
 	end
@@ -169,6 +178,22 @@ function safeDamage(entityOrPlayer, damageAmount)
 	if entity.valid and entity.health and entity.health > 0 then
 		entity.damage(damageAmount, game.forces.player, "laser")
 	end
+end
+
+function connectorPosition(postPos)  -- Make these so I don't have to remember how the offset works
+	if not postPos then return postPos end
+	if postPos.x then
+		return {x = postPos.x, y = postPos.y - offset}
+	end
+	return {postPos[1], postPos[2] - offset}
+end
+
+function postPosition(connectorPos)
+	if not connectorPos then return connectorPos end
+	if connectorPos.x then
+		return {x = connectorPos.x, y = connectorPos.y + offset}
+	end
+	return {connectorPos[1], connectorPos[2] + offset}
 end
 
 function registerEntity(entity)  -- Cache relevant information to global and register
@@ -254,7 +279,7 @@ function on_new_entity(event)
 		-- Create actual emitter
 		local emitter = surface.create_entity{
 			name = "laserfence-post-gate",
-			position = {position.x, position.y + offset},
+			position = postPosition(position),
 			force = force,
 			raise_built = true
 		}
@@ -273,7 +298,7 @@ function on_new_entity(event)
 		-- Create actual emitter
 		local emitter = surface.create_entity{
 			name = "laserfence-post",
-			position = {position.x, position.y + offset},
+			position = postPosition(position),
 			force = force,
 			raise_built = true
 		}
@@ -296,7 +321,7 @@ function on_remove_entity(event)
 		if (entity.name == "laserfence-post") or (entity.name == "laserfence-post-gate") then
 			if surface and surface.valid then
 				local ghost = surface.find_entities_filtered{position = entity.position, ghost_name = entity.name}[1]
-				for _, connector in pairs(surface.find_entities_filtered{name = connectorNames, position = {position.x, position.y - offset}, force = force}) do
+				for _, connector in pairs(surface.find_entities_filtered{name = connectorNames, position = connectorPosition(position), force = force}) do
 					if ghost then
 						connector.destructible = true
 						connector.die()

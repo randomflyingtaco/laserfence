@@ -92,96 +92,11 @@ data:extend{
 		icon = modName.."/graphics/post-icon.png",
 		icon_size = 64,
 		localised_description = {"entity-description.laserfence-post", baseRange, basePower, segmentPower},
-		flags = {"placeable-neutral", "placeable-off-grid", "player-creation", "not-blueprintable", "not-deconstructable"},
+		flags = {"placeable-neutral", "placeable-off-grid", "player-creation", "not-blueprintable"},
 		collision_box = {{-0.49, -0.49 - offset}, {0.49, 0.49 - offset}},
 		selection_box = {{-0.5, -0.5 - offset}, {0.5, 0.5 - offset}},
 		minable = {mining_time = 0.5, result = "laserfence-post"},
 		placeable_by = {item = "laserfence-post", count = 1},
-		fast_replaceable_group = "laserfence",
-		max_health = 200,
-		repair_speed_modifier = 1.5,
-		corpse = "wall-remnants",
-		repair_sound = {filename = "__base__/sound/manual-repair-simple.ogg"},
-		mined_sound = {filename = "__base__/sound/deconstruct-bricks.ogg"},
-		vehicle_impact_sound = {filename = "__base__/sound/car-stone-impact.ogg", volume = 1.0},
-		working_sound =	{
-			sound = {
-				filename = "__base__/sound/substation.ogg",
-				volume = 0.4
-			},
-			idle_sound = {
-				filename = "__base__/sound/accumulator-idle.ogg",
-				volume = 0.4
-			},
-			max_sounds_per_type = 3,
-			audible_distance_modifier = 0.5,
-			fade_in_ticks = 30,
-			fade_out_ticks = 40,
-			use_doppler_shift = false
-		},
-		energy_source = {
-			type = "electric",
-			buffer_capacity = tostring(5 * basePower).."kJ",
-			usage_priority = "primary-input",
-			input_flow_limit = tostring(basePower + 2 * (baseRange + 3 * addedRange) * segmentPower).."kW",
-			output_flow_limit = "0kW",
-			drain = "0kW"
-		},
-		energy_usage = tostring(basePower).."kW",
-		--render_layer = "higher-object-under",
-		animation = {
-			layers = {
-				{
-					filename = modName.."/graphics/post-animation.png",
-					priority = "extra-high",
-					frame_count = 32,
-					line_length = 16,
-					animation_speed = 0.02 / basePower,
-					axially_symmetrical = false,
-					direction_count = 1,
-					width = 128,
-					height = 256,
-					scale = 0.3,
-					shift = {0, -0.7}
-				}
-			}
-		},
-		resistances = {
-			{
-				type = "physical",
-				decrease = 3,
-				percent = 20
-			},
-			{
-				type = "impact",
-				decrease = 45,
-				percent = 60
-			},
-			{
-				type = "explosion",
-				decrease = 10,
-				percent = 30
-			},
-			{
-				type = "fire",
-				percent = 30
-			},
-			{
-				type = "laser",
-				percent = 80
-			}
-		}
-	},
-	{
-		type = "electric-energy-interface",
-		name = "laserfence-post-gate",
-		icons = gate_icons,
-		localised_description = {"entity-description.laserfence-post-gate", baseRange},
-		flags = {"placeable-neutral", "placeable-off-grid", "player-creation", "not-blueprintable", "not-deconstructable"},
-		collision_box = {{-0.49, -0.49 - offset}, {0.49, 0.49 - offset}},
-		selection_box = {{-0.5, -0.5 - offset}, {0.5, 0.5 - offset}},
-		minable = {mining_time = 0.5, result = "laserfence-post-gate"},
-		placeable_by = {item = "laserfence-post-gate", count = 1},
 		fast_replaceable_group = "laserfence",
 		max_health = 200,
 		repair_speed_modifier = 1.5,
@@ -535,7 +450,7 @@ data:extend{
 		localised_description = {"entity-description.laserfence-post", baseRange},
 		icon = modName.."/graphics/post-icon.png",
 		icon_size = 64,
-		flags = {"placeable-neutral", "player-creation"},
+		flags = {"placeable-neutral", "player-creation", "not-deconstructable"},
 		collision_box = {{-0.49, -0.49}, {0.49, 0.49}},
 		collision_mask = {"item-layer", "object-layer", "water-tile"}, -- disable collision
 		selection_box = {{-0.5, -0.5}, {0.5, 0.5}},
@@ -552,29 +467,6 @@ data:extend{
 			down  = post_sprite,
 			left  = post_sprite,
 			right = post_sprite,
-		},
-	},
-	{
-		type = "pipe-to-ground",
-		name = "laserfence-connector-gate",
-		localised_name = {"entity-name.laserfence-post-gate"},
-		localised_description = {"entity-description.laserfence-post-gate", baseRange},
-		icons = gate_icons,
-		flags = {"placeable-neutral", "player-creation"},
-		collision_box = {{-0.49, -0.49}, {0.49, 0.49}},
-		collision_mask = {"item-layer", "object-layer", "water-tile"}, -- disable collision
-		selection_box = {{-0.5, -0.5}, {0.5, 0.5}},
-		placeable_by = {item = "laserfence-post-gate", count = 1},
-		fast_replaceable_group = "laserfence",
-		fluid_box = {
-			filter = "fluid-unknown",
-			pipe_connections = all4pipes(baseRange + 1),  -- This version doesn't scale with upgrades
-		},
-		pictures = {
-			up	  = gate_post_sprite,
-			down  = gate_post_sprite,
-			left  = gate_post_sprite,
-			right = gate_post_sprite,
 		},
 	},
 	{
@@ -598,6 +490,16 @@ unselectable_beam.attack_reaction = nil
 unselectable_beam.secondary_draw_order = 2
 data:extend{unselectable_beam}
 
+local gate_post = util.table.deepcopy(data.raw["electric-energy-interface"]["laserfence-post"])
+gate_post.name = "laserfence-post-gate"
+gate_post.icon = nil
+gate_post.icon_size = nil
+gate_post.icons = gate_icons
+gate_post.localised_description = {"entity-description.laserfence-post-gate", baseRange}
+gate_post.minable.result = "laserfence-post-gate"
+gate_post.placeable_by.item = "laserfence-post-gate"
+data:extend{gate_post}
+
 for i = 0,3 do
 	local name = "laserfence-connector-"..tostring(i)
 	local prototype = table.deepcopy(data.raw["pipe-to-ground"]["laserfence-connector"])
@@ -605,3 +507,19 @@ for i = 0,3 do
 	prototype.fluid_box.pipe_connections = all4pipes(baseRange + 1 + i * addedRange)
 	data:extend{prototype}
 end
+
+local gate_connector = table.deepcopy(data.raw["pipe-to-ground"]["laserfence-connector"])
+gate_connector.localised_name = {"entity-name.laserfence-post-gate"}
+gate_connector.localised_description = {"entity-description.laserfence-post-gate", baseRange}
+gate_connector.icons = gate_icons
+gate_connector.icon = nil
+gate_connector.icon_size = nil
+gate_connector.placeable_by.item = "laserfence-post-gate"
+gate_connector.fluid_box.pipe_connections = all4pipes(baseRange + 1)  -- Currently does not benefit from range upgrades
+gate_connector.pictures = {
+	up	  = gate_post_sprite,
+	down  = gate_post_sprite,
+	left  = gate_post_sprite,
+	right = gate_post_sprite,
+}
+data:extend{gate_connector}

@@ -1,4 +1,8 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.6
+  Bugfixes:
+    - Fixed robots not being able to deconstruct Laser Fence posts
+---------------------------------------------------------------------------------------------------
 Version: 1.1.5
   Bugfixes:
     - Fixed performance issue for large save files
