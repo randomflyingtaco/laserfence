@@ -32,25 +32,27 @@ local gate_post_sprite = {
 	layers = {
 		{
 			filename = "__base__/graphics/entity/gate/gate-vertical.png",
-			height = 62,
-			width = 38,
-			x = 38 * 7,
-			y = 62,
+			height = 120,
+			width = 78,
+			x = 7 * 78,
+			y = 120,
 			shift = {
 				0,
 				-0.4375
 			},
+			scale = 0.5,
 		},
 		{
 			filename = "__base__/graphics/entity/gate/gate-horizontal.png",
-			height = 48,
-			width = 34,
-			x = 7 * 34,
-			y = 48,
+			height = 90,
+			width = 66,
+			x = 7 * 66,
+			y = 90,
 			shift = {
 				0,
 				-0.125
-			}
+			},
+			scale = 0.5,
 		},
 		post_sprite.layers[1],
 		post_sprite.layers[2]
@@ -79,8 +81,10 @@ local segmentPower = settings.startup["laserfence-segment-power"].value
 
 function all4pipes(distance)
 	local pipe_connections = {}
-	for _,position in pairs({{0,1}, {0,-1}, {1,0}, {-1,0}}) do
-		table.insert(pipe_connections, {position = position, max_underground_distance = distance})
+	for direction,position in pairs({[defines.direction.north] = {0,-0.4}, [defines.direction.east] = {0.4,0},
+			[defines.direction.south] = {0,0.4}, [defines.direction.west] = {-0.4,0}}) do
+		table.insert(pipe_connections, {connection_type = "underground", direction = direction, position = position,
+				connection_category = "laserfence", max_underground_distance = distance, max_distance_tint = {0, 1, 0, 1}})
 	end
 	return pipe_connections
 end
@@ -91,7 +95,7 @@ data:extend{
 		name = "laserfence-post",
 		icon = modName.."/graphics/post-icon.png",
 		icon_size = 64,
-		localised_description = {"entity-description.laserfence-post", baseRange, basePower, segmentPower},
+		localised_description = {"entity-description.laserfence-post", tostring(baseRange), tostring(basePower), tostring(segmentPower)},
 		flags = {"placeable-neutral", "placeable-off-grid", "player-creation", "not-blueprintable"},
 		collision_box = {{-0.49, -0.49 - offset}, {0.49, 0.49 - offset}},
 		selection_box = {{-0.5, -0.5 - offset}, {0.5, 0.5 - offset}},
@@ -179,7 +183,7 @@ data:extend{
 		icon_size = 64,
 		flags = {"placeable-neutral", "player-creation", "not-repairable"},
 		max_health = settings.startup["laserfence-health"].value,
-		selection_box = {{-0.5, -0.5}, {0.5, 0.5}},
+		selection_box = {{-0.5, -1.2}, {0.5, 0.5}},
 		selection_priority = 1,
 		collision_box = {{-0.49, -0.49}, {0.49, 0.49}},
 		fast_replaceable_group = "laserfence",
@@ -292,10 +296,10 @@ data:extend{
 		flags = {"placeable-neutral", "player-creation", "not-repairable"},
 		max_health = settings.startup["laserfence-health"].value,
 		is_military_target = true,
-		selection_box = {{-0.5, -0.5}, {0.5, 0.5}},
+		selection_box = {{-0.5, -1.2}, {0.5, 0.5}},
 		selection_priority = 1,
 		collision_box = {{-0.29, -0.29}, {0.29, 0.29}},
-		collision_mask = {},
+		collision_mask = {layers = {}},
 		fast_replaceable_group = "laserfence",
 		integration_patch_render_layer = "lower-object-above-shadow",
 		render_layer = "lower-object-above-shadow",
@@ -307,105 +311,6 @@ data:extend{
 		opening_speed = 1/16,
 		timeout_to_close = 5,
 		fadeout_interval = 15,
-		horizontal_animation = {
-			filename = "__base__/graphics/entity/gate/gate-horizontal.png",
-			height = 48,
-			width = 34,
-			x = 7 * 34,
-			y = 48,
-			shift = {
-				0,
-				-0.125
-			},
-		},
-		horizontal_rail_base = {
-			filename = "__base__/graphics/entity/gate/gate-rail-base-horizontal.png",
-			height = 54,
-			width = 66,
-			x = 7 * 66,
-			y = 54,
-			shift = {
-				0,
-				0.0625
-			},
-		},
-		horizontal_rail_animation_left = {
-			filename = "__base__/graphics/entity/gate/gate-rail-horizontal-left.png",
-			height = 40,
-			width = 34,
-			x = 7 * 34,
-			y = 40,
-			shift = {
-				0,
-				-0.25
-			},
-		},
-		horizontal_rail_animation_right = {
-			filename = "__base__/graphics/entity/gate/gate-rail-horizontal-right.png",
-			height = 40,
-			width = 34,
-			x = 7 * 34,
-			y = 40,
-			shift = {
-				0,
-				-0.25
-			},
-		},
-		vertical_animation = {
-			filename = "__base__/graphics/entity/gate/gate-vertical.png",
-			height = 62,
-			width = 38,
-			x = 38 * 7,
-			y = 62,
-			shift = {
-				0,
-				-0.4375
-			},
-		},
-		vertical_rail_base = {
-			filename = "__base__/graphics/entity/gate/gate-rail-base-vertical.png",
-			height = 66,
-			width = 68,
-			x = 68 * 7,
-			y = 66,
-			shift = {
-				0,
-				0
-			},
-		},
-		vertical_rail_animation_left = {
-			filename = "__base__/graphics/entity/gate/gate-rail-vertical-left.png",
-			height = 62,
-			width = 22,
-			x = 22 * 7,
-			y =62,
-			shift = {
-				0,
-				-0.4375
-			},
-		},
-		vertical_rail_animation_right = {
-			filename = "__base__/graphics/entity/gate/gate-rail-vertical-right.png",
-			height = 62,
-			width = 22,
-			x = 22 * 7,
-			y = 62,
-			shift = {
-				0,
-				-0.4375
-			},
-		},
-		wall_patch = {
-			filename = "__base__/graphics/entity/gate/gate-wall-patch.png",
-			height = 48,
-			width = 34,
-			x = 34 * 7,
-			y = 48,
-			shift = {
-				0,
-				0.375
-			},
-		},
 		attack_reaction = {
 			{
 				range = 3,
@@ -447,44 +352,56 @@ data:extend{
 		type = "pipe-to-ground",
 		name = "laserfence-connector",
 		localised_name = {"entity-name.laserfence-post"},
-		localised_description = {"entity-description.laserfence-post", baseRange},
+		localised_description = {"entity-description.laserfence-post", tostring(baseRange)},
 		icon = modName.."/graphics/post-icon.png",
 		icon_size = 64,
 		flags = {"placeable-neutral", "player-creation", "not-deconstructable"},
+		selectable_in_game = false,
 		collision_box = {{-0.49, -0.49}, {0.49, 0.49}},
-		collision_mask = {"item-layer", "object-layer", "water-tile"}, -- disable collision
+		collision_mask = {layers = {item = true, object = true, water_tile = true}}, -- disable collision
 		selection_box = {{-0.5, -0.5}, {0.5, 0.5}},
 		placeable_by = {item = "laserfence-post", count = 1},
 		fast_replaceable_group = "laserfence",
 		fluid_box = {
+			volume = 1,
 			filter = "fluid-unknown",
 			-- As long as most-upgraded version, so we can always use this prototype for the placement
 			-- and the connection length will be limited by the end that has already been placed
 			pipe_connections = all4pipes(baseRange + 1 + 3 * addedRange),
 		},
-		pictures = {
-			up    = post_sprite,
-			down  = post_sprite,
-			left  = post_sprite,
-			right = post_sprite,
-		},
+		pictures = post_sprite,
 	},
-	{
-		type = "flying-text",
-		name = "laserfence-obstruction-text",
-		flags = {"not-on-map", "placeable-off-grid"},
-		time_to_live = 180,
-		speed = 1 / 60,
-	}
 }
 
 if not settings.startup["laserfence-solid-walls"].value then
-	data.raw["simple-entity-with-force"]["laserfence-beam"].collision_mask = {"item-layer", "object-layer", "water-tile"}
+	data.raw["simple-entity-with-force"]["laserfence-beam"].collision_mask = {layers = {item = true, object = true, water_tile = true}}
+end
+
+if data.raw.gate["gate"] then
+	for _,property in pairs({"horizontal_animation", "horizontal_rail_base", "horizontal_rail_animation_left", "horizontal_rail_animation_right", 
+			"vertical_animation", "vertical_rail_base", "vertical_rail_animation_left", "vertical_rail_animation_right", "wall_patch"}) do
+		local sourceSprite
+		if data.raw.gate["gate"][property].layers then
+			sourceSprite = data.raw.gate["gate"][property].layers[1]
+		else
+			sourceSprite = data.raw.gate["gate"][property]
+		end
+		data.raw.gate["laserfence-beam-gate"][property] = {
+			filename = sourceSprite.filename,
+			height = sourceSprite.height,
+			width = sourceSprite.width,
+			x = 7 * sourceSprite.width,
+			y = sourceSprite.height,
+			shift = sourceSprite.shift,
+			scale = sourceSprite.scale,
+		}
+	end
 end
 
 local unselectable_beam = util.table.deepcopy(data.raw["simple-entity-with-force"]["laserfence-beam"])
 unselectable_beam.type = "simple-entity-with-owner"  -- Since it isn't a military target
 unselectable_beam.name = "laserfence-beam-unselectable"
+unselectable_beam.localised_name = {"entity-name.laserfence-beam-gate"}
 unselectable_beam.selection_box = nil
 unselectable_beam.attack_reaction = nil
 unselectable_beam.secondary_draw_order = 2
@@ -495,7 +412,7 @@ gate_post.name = "laserfence-post-gate"
 gate_post.icon = nil
 gate_post.icon_size = nil
 gate_post.icons = gate_icons
-gate_post.localised_description = {"entity-description.laserfence-post-gate", baseRange}
+gate_post.localised_description = {"entity-description.laserfence-post-gate", tostring(baseRange), tostring(basePower), tostring(segmentPower)}
 gate_post.minable.result = "laserfence-post-gate"
 gate_post.placeable_by.item = "laserfence-post-gate"
 data:extend{gate_post}
@@ -509,17 +426,13 @@ for i = 0,3 do
 end
 
 local gate_connector = table.deepcopy(data.raw["pipe-to-ground"]["laserfence-connector"])
+gate_connector.name = "laserfence-connector-gate"
 gate_connector.localised_name = {"entity-name.laserfence-post-gate"}
-gate_connector.localised_description = {"entity-description.laserfence-post-gate", baseRange}
+gate_connector.localised_description = {"entity-description.laserfence-post-gate", tostring(baseRange)}
 gate_connector.icons = gate_icons
 gate_connector.icon = nil
 gate_connector.icon_size = nil
 gate_connector.placeable_by.item = "laserfence-post-gate"
 gate_connector.fluid_box.pipe_connections = all4pipes(baseRange + 1)  -- Currently does not benefit from range upgrades
-gate_connector.pictures = {
-	up	  = gate_post_sprite,
-	down  = gate_post_sprite,
-	left  = gate_post_sprite,
-	right = gate_post_sprite,
-}
+gate_connector.pictures = gate_post_sprite
 data:extend{gate_connector}

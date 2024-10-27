@@ -5,11 +5,13 @@ data:extend{
 		enabled = false,
 		energy_required = 5,
 		ingredients = {
-			{"steel-plate", 20},
-			{"advanced-circuit", 10},
-			{"battery", 10}
+			{type = "item", name = "steel-plate", amount = 20},
+			{type = "item", name = "advanced-circuit", amount = 10},
+			{type = "item", name = "battery", amount = 10}
 		},
-		result = "laserfence-post"
+		results = {
+			{type = "item", name = "laserfence-post", amount = 1}
+		}
 	},
 	{
 		type = "recipe",
@@ -17,10 +19,12 @@ data:extend{
 		enabled = false,
 		energy_required = 5,
 		ingredients = {
-			{"steel-plate", 20},
-			{"advanced-circuit", 10},
-			{"battery", 10}
+			{type = "item", name = "steel-plate", amount = 20},
+			{type = "item", name = "advanced-circuit", amount = 10},
+			{type = "item", name = "battery", amount = 10}
 		},
-		result = "laserfence-post-gate"
+		results = {
+			{type = "item", name = "laserfence-post-gate", amount = 1}
+		}
 	}
 }

@@ -22,7 +22,7 @@ data:extend{
 		name = "laserfence-beam-weapon-scaling",
 		setting_type = "startup",
 		order = "b-b",
-		default_value = "true"
+		default_value = true
 	},
 	{
 		type = "int-setting",
@@ -65,14 +65,14 @@ data:extend{
 		name = "laserfence-solid-walls",
 		setting_type = "startup",
 		order = "y-a",
-		default_value = "true"
+		default_value = true
 	},
 	{
 		type = "bool-setting",
 		name = "laserfence-debug-text",
 		setting_type = "startup",
 		order = "z-z",
-		default_value = "false"
+		default_value = false
 	},
 }
 
@@ -81,12 +81,12 @@ for _, type in pairs({"int-setting", "bool-setting"}) do
 	for name, setting in pairs(data.raw[type]) do
 		if string.sub(name, 1, 10) == "laserfence" then
 			local default = setting.default_value
-			if default == "true" then  -- Because true/false looks ugly
+			if default == true then  -- Because true/false looks ugly
 				default = "Enabled"
-			elseif default == "false" then
+			elseif default == false then
 				default = "Disabled"
 			end
-			setting.localised_description = {"mod-setting-description.laserfence-template", {"mod-setting-description."..name}, default}
+			setting.localised_description = {"mod-setting-description.laserfence-template", {"mod-setting-description."..name}, tostring(default)}
 		end
 	end
 end

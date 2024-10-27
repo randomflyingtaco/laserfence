@@ -9,16 +9,16 @@ local connectorNames = {"laserfence-connector", "laserfence-connector-0", "laser
 local offset = 0.0625
 
 script.on_init(function()
-	global.laserfenceOnEntityDestroyed = {}
-	global.laserfenceObstruction = {}
-	global.laserfenceDamageMulti = {}
-	global.laserfenceRangeUpgradeLevel = {}
-	global.laserfenceEfficiencyUpgradeLevel = {}
+	storage.laserfenceOnEntityDestroyed = {}
+	storage.laserfenceObstruction = {}
+	storage.laserfenceDamageMulti = {}
+	storage.laserfenceRangeUpgradeLevel = {}
+	storage.laserfenceEfficiencyUpgradeLevel = {}
 	for name, force in pairs(game.forces) do
 		local multi = force.get_ammo_damage_modifier("laser") or 0
-		global.laserfenceDamageMulti[name] = multi
-		global.laserfenceRangeUpgradeLevel[name] = 0
-		global.laserfenceEfficiencyUpgradeLevel[name] = 0
+		storage.laserfenceDamageMulti[name] = multi
+		storage.laserfenceRangeUpgradeLevel[name] = 0
+		storage.laserfenceEfficiencyUpgradeLevel[name] = 0
 	end
 	CnC_SonicWall_OnInit()
 end)
@@ -26,9 +26,9 @@ end)
 script.on_configuration_changed(function(event)
 	if migration.upgradingToVersion(event, "1.1.1") then
 		game.print("Ran conversion for Laser Fence version 1.1.1")
-		global.SRF_nodes = {}
-		global.SRF_node_ticklist = {}
-		global.SRF_low_power_ticklist = {}
+		storage.SRF_nodes = {}
+		storage.SRF_node_ticklist = {}
+		storage.SRF_low_power_ticklist = {}
 
 		for _, surface in pairs(game.surfaces) do
 			-- Reposition emitters
@@ -37,14 +37,14 @@ script.on_configuration_changed(function(event)
 				CnC_SonicWall_AddNode(post, game.tick)
 			end
 		end
-		-- Update global for new shared-obstruction registration
-		for registration_number, entityInfo in pairs(global.laserfenceObstruction) do
-			global.laserfenceObstruction[registration_number] = {entityInfo}
+		-- Update storage for new shared-obstruction registration
+		for registration_number, entityInfo in pairs(storage.laserfenceObstruction) do
+			storage.laserfenceObstruction[registration_number] = {entityInfo}
 		end
 	end
 	if migration.upgradingToVersion(event, "1.1.2") then
 		game.print("Ran conversion for Laser Fence version 1.1.2")
-		global.laserfenceRangeUpgradeLevel = {}
+		storage.laserfenceRangeUpgradeLevel = {}
 		for _, force in pairs(game.forces) do
 			if force.technologies["laserfence"].researched then
 				force.technologies["laserfence-range-1"].researched = true  -- Grant them the extra range to get back to 15 if they converted
@@ -57,7 +57,7 @@ script.on_configuration_changed(function(event)
 			-- Convert ghosts
 			for _, ghost in pairs(surface.find_entities_filtered{ghost_name = "laserfence-post"}) do
 				local force = ghost.force.name
-				local connector = "laserfence-connector-"..tostring(global.laserfenceRangeUpgradeLevel[force])
+				local connector = "laserfence-connector-"..tostring(storage.laserfenceRangeUpgradeLevel[force])
 				ghost.destroy()
 				surface.create_entity{
 					name = "entity-ghost",
@@ -71,7 +71,7 @@ script.on_configuration_changed(function(event)
 			for _, post in pairs(surface.find_entities_filtered{name = "laserfence-post"}) do
 				local position = connectorPosition(post.position)
 				local force = post.force.name
-				local connector = "laserfence-connector-"..tostring(global.laserfenceRangeUpgradeLevel[force])
+				local connector = "laserfence-connector-"..tostring(storage.laserfenceRangeUpgradeLevel[force])
 				if not surface.find_entity(connector, position) then
 					surface.create_entity{
 						name = connector,
@@ -90,11 +90,11 @@ script.on_configuration_changed(function(event)
 	end
 	if migration.upgradingToVersion(event, "1.1.4") then
 		game.print("Ran conversion for Laser Fence version 1.1.4")
-		global.SRF_nodes = {}
-		global.SRF_node_ticklist = {}
-		global.SRF_low_power_ticklist = {}
-		global.SRF_segments = {}
-		global.laserfenceEfficiencyUpgradeLevel = {}
+		storage.SRF_nodes = {}
+		storage.SRF_node_ticklist = {}
+		storage.SRF_low_power_ticklist = {}
+		storage.SRF_segments = {}
+		storage.laserfenceEfficiencyUpgradeLevel = {}
 		for _, force in pairs(game.forces) do
 			updateEfficiencyLevel(force)
 		end
@@ -121,12 +121,12 @@ script.on_configuration_changed(function(event)
 end)
 
 commands.add_command("laserfenceRebuild",
-	"Update globals",
+	"Update storages",
 	function()
-		global.SRF_nodes = {}
-		global.SRF_node_ticklist = {}
-		global.SRF_low_power_ticklist = {}
-		global.SRF_segments = {}
+		storage.SRF_nodes = {}
+		storage.SRF_node_ticklist = {}
+		storage.SRF_low_power_ticklist = {}
+		storage.SRF_segments = {}
 		for _, surface in pairs(game.surfaces) do
 			for _, beam in pairs(surface.find_entities_filtered{name = {"laserfence-beam", "laserfence-beam-gate"}}) do
 				beam.destroy()
@@ -135,14 +135,14 @@ commands.add_command("laserfenceRebuild",
 				CnC_SonicWall_AddNode(post, game.tick)
 			end
 		end
-		game.player.print("Found " .. #global.SRF_nodes .. " laser fence posts")
+		game.player.print("Found " .. #storage.SRF_nodes .. " laser fence posts")
 		
-		global.laserfenceDamageMulti = {}
-		global.laserfenceRangeUpgradeLevel = {}
-		global.laserfenceEfficiencyUpgradeLevel = {}
+		storage.laserfenceDamageMulti = {}
+		storage.laserfenceRangeUpgradeLevel = {}
+		storage.laserfenceEfficiencyUpgradeLevel = {}
 		for _, force in pairs(game.forces) do
 			local multi = force.get_ammo_damage_modifier("laser") or 0
-			global.laserfenceDamageMulti[force.name] = multi
+			storage.laserfenceDamageMulti[force.name] = multi
 			updateConnectorLevel(force)
 			updateEfficiencyLevel(force)
 		end
@@ -160,7 +160,7 @@ script.on_event(defines.events.on_script_trigger_effect, function(event)
 	if event.effect_id == "laserfence-reflect-damage" and baseDamage > 0 then
 		local multi = 0
 		if beamScaling then
-			multi = global.laserfenceDamageMulti[event.source_entity.force.name]
+			multi = storage.laserfenceDamageMulti[event.source_entity.force.name]
 		end
 		if debugText and event.target_entity then game.print("Dealing "..(baseDamage * (1 + multi)).." reflect damage to "..event.target_entity.name) end
 		safeDamage(event.target_entity, baseDamage * (1 + multi))
@@ -196,32 +196,32 @@ function postPosition(connectorPos)
 	return {connectorPos[1], connectorPos[2] + offset}
 end
 
-function registerEntity(entity)  -- Cache relevant information to global and register
+function registerEntity(entity)  -- Cache relevant information to storage and register
 	local entityInfo = {}
 	for _, property in pairs({"name", "type", "position", "surface", "force"}) do
 		entityInfo[property] = entity[property]
 	end
-	local registration_number = script.register_on_entity_destroyed(entity)
-	global.laserfenceOnEntityDestroyed[registration_number] = entityInfo
+	local registration_number = script.register_on_object_destroyed(entity)
+	storage.laserfenceOnEntityDestroyed[registration_number] = entityInfo
 end
 
-function registerObstruction(entity, node1, node2)  -- Cache relevant information to global and register
+function registerObstruction(entity, node1, node2)  -- Cache relevant information to storage and register
 	local entityInfo = {}
 	entityInfo["node1"] = node1
 	entityInfo["node2"] = node2
 	for _, property in pairs({"name", "type", "position", "surface", "force"}) do
 		entityInfo[property] = entity[property]
 	end
-	local registration_number = script.register_on_entity_destroyed(entity)
-	if global.laserfenceObstruction[registration_number] then
-		table.insert(global.laserfenceObstruction[registration_number], entityInfo)
+	local registration_number = script.register_on_object_destroyed(entity)
+	if storage.laserfenceObstruction[registration_number] then
+		table.insert(storage.laserfenceObstruction[registration_number], entityInfo)
 	else
-		global.laserfenceObstruction[registration_number] = {entityInfo}
+		storage.laserfenceObstruction[registration_number] = {entityInfo}
 	end
 end
 
 function updateConnectorLevel(force)
-	-- Update global
+	-- Update storage
 	local level = 0
 	for i = 3,1,-1 do
 		if force.technologies["laserfence-range-"..tostring(i)].researched then
@@ -229,7 +229,7 @@ function updateConnectorLevel(force)
 			break
 		end
 	end
-	global.laserfenceRangeUpgradeLevel[force.name] = level
+	storage.laserfenceRangeUpgradeLevel[force.name] = level
 
 	for _, surface in pairs(game.surfaces) do
 		-- Swap pipe-to-ground to update range
@@ -252,7 +252,7 @@ function updateConnectorLevel(force)
 end
 
 function updateEfficiencyLevel(force)
-	-- Update global
+	-- Update storage
 	local level = 0
 	for i = 3,1,-1 do
 		if force.technologies["laserfence-efficiency-"..tostring(i)].researched then
@@ -260,7 +260,7 @@ function updateEfficiencyLevel(force)
 			break
 		end
 	end
-	global.laserfenceEfficiencyUpgradeLevel[force.name] = level
+	storage.laserfenceEfficiencyUpgradeLevel[force.name] = level
 
 	for _, surface in pairs(game.surfaces) do
 		for _, emitter in pairs(surface.find_entities_filtered{name = {"laserfence-post", "laserfence-post-gate"}, force = force}) do
@@ -289,7 +289,7 @@ function on_new_entity(event)
 		-- Swap the generic pipe-to-ground to the correct length version
 		new_entity.destroy()
 		local connector = surface.create_entity{
-			name = "laserfence-connector-"..tostring(global.laserfenceRangeUpgradeLevel[force.name]),
+			name = "laserfence-connector-"..tostring(storage.laserfenceRangeUpgradeLevel[force.name]),
 			force = force,
 			position = position,
 			create_build_effect_smoke = false
@@ -313,7 +313,7 @@ script.on_event(defines.events.script_raised_built, on_new_entity)
 script.on_event(defines.events.script_raised_revive, on_new_entity)
 
 function on_remove_entity(event)
-	local entity = global.laserfenceOnEntityDestroyed[event.registration_number]
+	local entity = storage.laserfenceOnEntityDestroyed[event.registration_number]
 	if entity then
 		local surface = entity.surface
 		local position = entity.position
@@ -335,9 +335,9 @@ function on_remove_entity(event)
 			end
 			CnC_SonicWall_DeleteNode(entity, event.tick)
 		end
-		global.laserfenceOnEntityDestroyed[event.registration_number] = nil  -- Avoid this global growing forever
-	elseif global.laserfenceObstruction[event.registration_number] then
-		for _, entityInfo in pairs(global.laserfenceObstruction[event.registration_number]) do --TODO crash?
+		storage.laserfenceOnEntityDestroyed[event.registration_number] = nil  -- Avoid this storage growing forever
+	elseif storage.laserfenceObstruction[event.registration_number] then
+		for _, entityInfo in pairs(storage.laserfenceObstruction[event.registration_number]) do --TODO crash?
 			if entityInfo then
 				local node1 = entityInfo.node1
 				local node2 = entityInfo.node2
@@ -346,11 +346,11 @@ function on_remove_entity(event)
 				end
 			end
 		end
-		global.laserfenceObstruction[event.registration_number] = nil  -- Avoid this global growing forever
+		storage.laserfenceObstruction[event.registration_number] = nil  -- Avoid this storage growing forever
 	end
 end
 
-script.on_event(defines.events.on_entity_destroyed, on_remove_entity)
+script.on_event(defines.events.on_object_destroyed, on_remove_entity)
 
 script.on_event(defines.events.on_entity_died, function(event)
 	if event.entity and ((event.entity.name == "laserfence-beam") or (event.entity.name == "laserfence-beam-gate")) then
@@ -362,7 +362,7 @@ end
 script.on_event({defines.events.on_research_finished, defines.events.on_research_reversed}, function(event)
 	local force = event.research.force
 	local multi = force.get_ammo_damage_modifier("laser") or 0
-	global.laserfenceDamageMulti[force.name] = multi
+	storage.laserfenceDamageMulti[force.name] = multi
 	if string.sub(event.research.name, 1, 16) == "laserfence-range" then
 		updateConnectorLevel(force)
 	elseif string.sub(event.research.name, 1, 21) == "laserfence-efficiency" then
@@ -373,17 +373,17 @@ end
 
 script.on_event({defines.events.on_force_created, defines.events.on_force_reset}, function(event)
 	local multi = event.force.get_ammo_damage_modifier("laser") or 0
-	global.laserfenceDamageMulti[event.force.name] = multi
+	storage.laserfenceDamageMulti[event.force.name] = multi
 	updateConnectorLevel(event.force)
 	updateEfficiencyLevel(event.force)
 end
 )
 
 script.on_event(defines.events.on_forces_merged, function(event)
-	for _, globalName in pairs(global.laserfenceOnEntityDestroyed, global.laserfenceObstruction) do
-		for registration_number, entityInfo in pairs(globalName) do
+	for _, storageName in pairs(storage.laserfenceOnEntityDestroyed, storage.laserfenceObstruction) do
+		for registration_number, entityInfo in pairs(storageName) do
 			if entityInfo.force.name == event.source_name then
-				globalName[registration_number].force = event.destination
+				storageName[registration_number].force = event.destination
 			end
 		end
 	end

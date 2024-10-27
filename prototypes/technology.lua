@@ -66,7 +66,7 @@ data:extend{
 		effects = {
 			{
 				type = "nothing",
-				effect_description = {"technology-description.laserfence-range-effect", settings.startup["laserfence-added-range"].value}
+				effect_description = {"technology-description.laserfence-range-effect", tostring(settings.startup["laserfence-added-range"].value)}
 			}
 		},
 		prerequisites = {"laserfence"},
@@ -90,7 +90,7 @@ data:extend{
 		effects = {
 			{
 				type = "nothing",
-				effect_description = {"technology-description.laserfence-range-effect", settings.startup["laserfence-added-range"].value}
+				effect_description = {"technology-description.laserfence-range-effect", tostring(settings.startup["laserfence-added-range"].value)}
 			}
 		},
 		prerequisites = {"laserfence-range-1", "utility-science-pack"},
@@ -115,7 +115,7 @@ data:extend{
 		effects = {
 			{
 				type = "nothing",
-				effect_description = {"technology-description.laserfence-range-effect", settings.startup["laserfence-added-range"].value}
+				effect_description = {"technology-description.laserfence-range-effect", tostring(settings.startup["laserfence-added-range"].value)}
 			}
 		},
 		prerequisites = {"laserfence-range-2", "space-science-pack"},
