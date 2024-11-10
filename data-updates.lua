@@ -13,7 +13,7 @@ local function consolidateDamageEffects(TriggerEffects)
 			damageTotal = damageTotal + effect.damage.amount
 			damageType = damageType or effect.damage.type
 		else
-			table.insert(out, {effect})
+			table.insert(out, effect)
 		end
 	end
 	if damageTotal > 0 then
@@ -23,7 +23,7 @@ local function consolidateDamageEffects(TriggerEffects)
 end
 
 -- Temporary fix to convert enemies with hybrid damage types into a single damage type
-for name,unit in pairs(data.raw.unit) do
+for _,unit in pairs(data.raw.unit) do
 	if unit.attack_parameters and unit.attack_parameters.ammo_type and unit.attack_parameters.ammo_type.action and unit.attack_parameters.ammo_type.action.action_delivery then
 		if unit.attack_parameters.ammo_type.action.action_delivery.target_effects then
 			local effects = unit.attack_parameters.ammo_type.action.action_delivery.target_effects
