@@ -1,4 +1,8 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.0.2
+  Bugfixes:
+    - Fix startup error laserfence/data-updates.lua:35: attempt to index local 'triggerDelivery' (a number value) 
+---------------------------------------------------------------------------------------------------
 Version: 2.0.1
   Bugfixes:
     - Temporary fix for crash that occurs when Wrigglers die to Laser Fences

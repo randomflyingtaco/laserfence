@@ -30,7 +30,7 @@ for name,unit in pairs(data.raw.unit) do
 			if not effects.type then
 				unit.attack_parameters.ammo_type.action.action_delivery.target_effects = table.deepcopy(consolidateDamageEffects(effects))
 			end
-		else
+		elseif unit.attack_parameters.ammo_type.action.action_delivery[1] then
 			for key,triggerDelivery in pairs(unit.attack_parameters.ammo_type.action.action_delivery) do
 				local effects = triggerDelivery.target_effects
 				if effects and not effects.type then
