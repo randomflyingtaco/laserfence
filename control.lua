@@ -380,7 +380,7 @@ end
 )
 
 script.on_event(defines.events.on_forces_merged, function(event)
-	for _, storageName in pairs(storage.laserfenceOnEntityDestroyed, storage.laserfenceObstruction) do
+	for _, storageName in pairs({storage.laserfenceOnEntityDestroyed, storage.laserfenceObstruction}) do
 		for registration_number, entityInfo in pairs(storageName) do
 			if entityInfo.force.name == event.source_name then
 				storageName[registration_number].force = event.destination

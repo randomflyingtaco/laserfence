@@ -1,4 +1,8 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.0.1
+  Bugfixes:
+    - Temporary fix for crash that occurs when Wrigglers die to Laser Fences
+---------------------------------------------------------------------------------------------------
 Version: 2.0.0
   Features:
     - Updated to Factorio 2.0
