@@ -82,11 +82,13 @@ for _, type in pairs({"int-setting", "bool-setting"}) do
 		if string.sub(name, 1, 10) == "laserfence" then
 			local default = setting.default_value
 			if default == true then  -- Because true/false looks ugly
-				default = "Enabled"
+				default = {"mod-setting-description.laserfence-enabled"}
 			elseif default == false then
-				default = "Disabled"
+				default = {"mod-setting-description.laserfence-disabled"}
+			else
+				default = tostring(default)
 			end
-			setting.localised_description = {"mod-setting-description.laserfence-template", {"mod-setting-description."..name}, tostring(default)}
+			setting.localised_description = {"mod-setting-description.laserfence-template", {"mod-setting-description."..name}, default}
 		end
 	end
 end

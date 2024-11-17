@@ -2,6 +2,8 @@
 Version: 2.0.4
   Changes:
     - Removed temporary fix for Wrigglers since core Factorio fixed the issue with Base 2.0.17 (Thanks Rseding91!)
+  Bugfixes:
+    - Fixed incomplete tooltips for Laser Fence items
 ---------------------------------------------------------------------------------------------------
 Version: 2.0.3
   Bugfixes:

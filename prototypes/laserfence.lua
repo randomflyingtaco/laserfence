@@ -352,7 +352,7 @@ data:extend{
 		type = "pipe-to-ground",
 		name = "laserfence-connector",
 		localised_name = {"entity-name.laserfence-post"},
-		localised_description = {"entity-description.laserfence-post", tostring(baseRange)},
+		localised_description = {"entity-description.laserfence-post", tostring(baseRange), tostring(basePower), tostring(segmentPower)},
 		icon = modName.."/graphics/post-icon.png",
 		icon_size = 64,
 		flags = {"placeable-neutral", "player-creation", "not-deconstructable"},
@@ -428,7 +428,7 @@ end
 local gate_connector = table.deepcopy(data.raw["pipe-to-ground"]["laserfence-connector"])
 gate_connector.name = "laserfence-connector-gate"
 gate_connector.localised_name = {"entity-name.laserfence-post-gate"}
-gate_connector.localised_description = {"entity-description.laserfence-post-gate", tostring(baseRange)}
+gate_connector.localised_description = {"entity-description.laserfence-post-gate", tostring(baseRange), tostring(basePower), tostring(segmentPower)}
 gate_connector.icons = gate_icons
 gate_connector.icon = nil
 gate_connector.icon_size = nil
