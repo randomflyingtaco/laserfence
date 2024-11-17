@@ -398,7 +398,7 @@ if data.raw.gate["gate"] then
 	end
 end
 
-local unselectable_beam = util.table.deepcopy(data.raw["simple-entity-with-force"]["laserfence-beam"])
+local unselectable_beam = util.copy(data.raw["simple-entity-with-force"]["laserfence-beam"])
 unselectable_beam.type = "simple-entity-with-owner"  -- Since it isn't a military target
 unselectable_beam.name = "laserfence-beam-unselectable"
 unselectable_beam.localised_name = {"entity-name.laserfence-beam-gate"}
@@ -407,7 +407,7 @@ unselectable_beam.attack_reaction = nil
 unselectable_beam.secondary_draw_order = 2
 data:extend{unselectable_beam}
 
-local gate_post = util.table.deepcopy(data.raw["electric-energy-interface"]["laserfence-post"])
+local gate_post = util.copy(data.raw["electric-energy-interface"]["laserfence-post"])
 gate_post.name = "laserfence-post-gate"
 gate_post.icon = nil
 gate_post.icon_size = nil
@@ -419,13 +419,13 @@ data:extend{gate_post}
 
 for i = 0,3 do
 	local name = "laserfence-connector-"..tostring(i)
-	local prototype = table.deepcopy(data.raw["pipe-to-ground"]["laserfence-connector"])
+	local prototype = util.copy(data.raw["pipe-to-ground"]["laserfence-connector"])
 	prototype.name = name
 	prototype.fluid_box.pipe_connections = all4pipes(baseRange + 1 + i * addedRange)
 	data:extend{prototype}
 end
 
-local gate_connector = table.deepcopy(data.raw["pipe-to-ground"]["laserfence-connector"])
+local gate_connector = util.copy(data.raw["pipe-to-ground"]["laserfence-connector"])
 gate_connector.name = "laserfence-connector-gate"
 gate_connector.localised_name = {"entity-name.laserfence-post-gate"}
 gate_connector.localised_description = {"entity-description.laserfence-post-gate", tostring(baseRange), tostring(basePower), tostring(segmentPower)}
