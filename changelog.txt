@@ -1,4 +1,13 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.2.4
+Date: 17. 11. 2024
+  Info:
+    - Updated by Fr_Dae
+  Changes:
+    - Add Fr loc
+    - Cleanup injo.js
+    - add lignbreak on FR file (you should make same on EN)
+---------------------------------------------------------------------------------------------------
 Version: 2.0.3
   Bugfixes:
     - Fixed crash with Fulgoran Enemies

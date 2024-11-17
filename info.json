@@ -1,17 +1,20 @@
 {
 	"name": "laserfence",
-	"version": "2.0.3",
-	"title": "Laser Fence",
-	"author": "randomflyingtaco and Sacredanarchy",
-	"contact": "",
-	"homepage": "https://discord.gg/freXKz5",
-	"factorio_version": "2.0",
+	"title": "⚡ C&C Laserfence",
+	"description": "⚡Use Laser Fence technology that was developed during the Tiberium Wars to fend off biters.",
+
+	"author": "randomflyingtaco, Sacredanarchyc",
+    "contact": "https://github.com/randomflyingtaco/laserfence",
+    "homepage": "https://discord.gg/freXKz5",
+
+	"version": "2.0.4",
+    "factorio_version": "2.0",
 	"dependencies": [
-		"base >= 2.0",
-		"? space-age",
+	    "base",
+	    "? space-age",
 		"? Factorio-Tiberium",
 		"? TeslaTank",
 		"? Soviet-Tesla_Coils"
-	],
-	"description": "Use Laser Fence technology that was developed during the Tiberium Wars to fend off biters."
+	]
+
 }
