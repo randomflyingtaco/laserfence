@@ -1,12 +1,12 @@
 ---------------------------------------------------------------------------------------------------
 Version: 2.0.4
 Date: 17. 11. 2024
-  Info:
-    - Updated by Fr_Dae
+  Features:
+    - Added French localisation (Thanks Fr_dae!)
   Changes:
-    - Add Fr loc
-    - Cleanup injo.js
-    - add lignbreak on FR file (you should make same on EN)
+    - Removed temporary fix for Wrigglers since core Factorio fixed the issue with Base 2.0.17 (Thanks Rseding91!)
+  Bugfixes:
+    - Fixed incomplete tooltips for Laser Fence items
 ---------------------------------------------------------------------------------------------------
 Version: 2.0.3
   Bugfixes:
