@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 2.0.4
-Date: 17. 11. 2024
+Date: 19. 11. 2024
   Features:
     - Added French localisation (Thanks Fr_dae!)
   Changes:
